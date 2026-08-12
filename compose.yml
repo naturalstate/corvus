@@ -1,0 +1,75 @@
+# =============================================================================
+# ©AngelaMos | 2026
+# compose.yml
+# =============================================================================
+# Production compose: nginx serves the built React app and proxies /api to the
+# tlsfp backend. The backend lives under the `backend` profile and is not
+# started by default until the serve command is implemented.
+#   docker compose --env-file .env up
+#   docker compose --env-file .env --profile backend up
+#   docker compose -f compose.yml -f cloudflared.compose.yml up
+# =============================================================================
+
+name: ${APP_NAME:-tlsfp}
+
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: infra/docker/vite.prod
+      args:
+        - VITE_API_URL=${VITE_API_URL:-/api}
+        - VITE_APP_TITLE=${VITE_APP_TITLE:-JA3/JA4 TLS Fingerprinting}
+    container_name: ${APP_NAME:-tlsfp}-nginx
+    ports:
+      - "${NGINX_HOST_PORT:-11790}:80"
+    networks:
+      - app
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 64M
+    restart: unless-stopped
+
+  tlsfp:
+    build:
+      context: .
+      dockerfile: infra/docker/tlsfp.prod
+    container_name: ${APP_NAME:-tlsfp}-backend
+    # Demo posture: seed the bundled corpus, then serve while replaying a
+    # vendored capture on a loop so the dashboard is alive the moment it boots.
+    # For a real sensor instead, set command back to ["serve", "0.0.0.0:8080"]
+    # and feed it from `tlsfp live --detect` against the shared /data volume.
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        tlsfp intel seed --db /data/intel.db || true
+        exec tlsfp serve 0.0.0.0:8080 --db /data/intel.db --replay /demo/demo.pcap --loop --interval-ms 600
+    profiles:
+      - backend
+    environment:
+      - RUST_LOG=${RUST_LOG:-tlsfp=info}
+    volumes:
+      - tlsfp_data:/data
+    networks:
+      - app
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 64M
+    restart: unless-stopped
+
+networks:
+  app:
+    driver: bridge
+
+volumes:
+  tlsfp_data:

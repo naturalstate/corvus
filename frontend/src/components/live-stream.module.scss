@@ -1,0 +1,237 @@
+// ===================
+// ©AngelaMos | 2026
+// live-stream.module.scss
+// ===================
+
+@use 'index' as *;
+
+.frame {
+  height: 100%;
+  min-height: 420px;
+}
+
+.aside {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-3;
+}
+
+.live {
+  color: $dust;
+  text-transform: uppercase;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-right: $space-1-5;
+    background: $dust;
+    vertical-align: middle;
+  }
+}
+
+.liveOn {
+  color: $fire;
+  animation: rec-blink 1.5s ease-in-out infinite;
+
+  &::before {
+    background: $fire;
+    box-shadow: 0 0 5px 0 $fire;
+  }
+}
+
+.count {
+  color: $ash;
+}
+
+.scroll {
+  position: absolute;
+  inset: 0;
+  overflow: hidden auto;
+}
+
+.row {
+  display: grid;
+  grid-template-columns:
+    82px 38px minmax(96px, 1.05fr) minmax(150px, 1.7fr) auto;
+  align-items: center;
+  gap: $space-3;
+  padding: 5px $space-3;
+  border-bottom: 1px solid $line-faint;
+  font-family: $font-mono;
+  font-size: $font-size-2xs;
+  line-height: 1.45;
+
+  &:hover {
+    background: $ink-800;
+  }
+}
+
+.time {
+  color: $dust;
+  font-size: $font-size-3xs;
+  letter-spacing: 0.02em;
+}
+
+.code {
+  justify-self: start;
+  padding: 0 3px;
+  color: $ash;
+  font-size: $font-size-3xs;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  border: 1px solid $line-faint;
+}
+
+.codeAlert {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.route {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  min-width: 0;
+  color: $paper;
+}
+
+.host {
+  @include truncate;
+
+  max-width: 100%;
+}
+
+.arrow {
+  flex-shrink: 0;
+  color: $soot;
+}
+
+.fp {
+  display: flex;
+  align-items: baseline;
+  gap: $space-2;
+  min-width: 0;
+}
+
+.fpKind {
+  flex-shrink: 0;
+  color: $dust;
+  font-size: $font-size-3xs;
+  text-transform: uppercase;
+}
+
+.fpValue {
+  @include truncate;
+
+  color: $volt-soft;
+}
+
+.row[data-verdict='malicious'] .fpValue {
+  @include text-glow($blood, 0.4);
+}
+
+.row[data-verdict='suspicious'] .fpValue {
+  color: $fire;
+}
+
+.row[data-verdict='benign'] .fpValue {
+  color: $thermal;
+}
+
+.marks {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: $space-2;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+  box-shadow: 0 0 8px -1px var(--accent);
+}
+
+.rowHot {
+  border-left: 2px solid $fire;
+  background: linear-gradient(
+    90deg,
+    rgb(255, 77, 18, 14%),
+    transparent 55%
+  );
+
+  &:hover {
+    background: linear-gradient(
+      90deg,
+      rgb(255, 77, 18, 20%),
+      transparent 55%
+    );
+  }
+}
+
+.alertRow {
+  border-left: 2px solid var(--accent);
+  background: linear-gradient(
+    90deg,
+    rgb(255, 174, 58, 8%),
+    transparent 60%
+  );
+}
+
+.alertTitle {
+  @include truncate;
+
+  grid-column: 3 / 5;
+  color: $bone;
+}
+
+.enter {
+  animation: row-enter 0.45s $ease-out both;
+}
+
+.idle {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 220px;
+  padding: $space-8;
+  text-align: center;
+  font-family: $font-mono;
+}
+
+.idleLine {
+  color: $ash;
+  font-size: $font-size-xs;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.idleSub {
+  color: $soot;
+  font-size: $font-size-3xs;
+  letter-spacing: 0.08em;
+}
+
+@keyframes row-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-7px);
+    background: rgb(47, 123, 255, 9%);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes rec-blink {
+  50% {
+    opacity: 0.45;
+  }
+}

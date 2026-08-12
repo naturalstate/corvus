@@ -1,0 +1,209 @@
+# =============================================================================
+# ©AngelaMos | 2026
+# justfile
+# =============================================================================
+
+set dotenv-filename := ".env.development"
+set dotenv-load
+set export
+set shell := ["bash", "-uc"]
+set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
+
+project := file_name(justfile_directory())
+version := `git describe --tags --always 2>/dev/null || echo "dev"`
+
+# =============================================================================
+# Default
+# =============================================================================
+
+default:
+    @just --list --unsorted
+
+# =============================================================================
+# Frontend Linting
+# =============================================================================
+
+[group('lint')]
+biome *ARGS:
+    cd frontend && pnpm biome check . {{ARGS}}
+
+[group('lint')]
+biome-fix:
+    cd frontend && pnpm biome check --write .
+
+[group('lint')]
+stylelint *ARGS:
+    cd frontend && pnpm stylelint '**/*.scss' {{ARGS}}
+
+[group('lint')]
+stylelint-fix:
+    cd frontend && pnpm stylelint '**/*.scss' --fix
+
+[group('lint')]
+tsc *ARGS:
+    cd frontend && pnpm tsc --noEmit {{ARGS}}
+
+# =============================================================================
+# Backend (Rust)
+# =============================================================================
+
+[group('backend')]
+build-backend:
+    cargo build --release --bin tlsfp
+
+[group('backend')]
+run-backend *ARGS:
+    cargo run --bin tlsfp -- {{ARGS}}
+
+[group('backend')]
+test-backend:
+    cargo test --workspace
+
+[group('backend')]
+bench *ARGS:
+    cargo bench --bench fingerprint {{ARGS}}
+
+[group('backend')]
+clippy:
+    cargo clippy --workspace --all-targets -- -D warnings
+
+[group('backend')]
+fmt:
+    cargo fmt --all
+
+[group('backend')]
+fmt-check:
+    cargo fmt --all -- --check
+
+# =============================================================================
+# Docker Compose (Production)
+# =============================================================================
+
+[group('prod')]
+up *ARGS:
+    docker compose --env-file .env up {{ARGS}}
+
+[group('prod')]
+start *ARGS:
+    docker compose --env-file .env up -d {{ARGS}}
+
+[group('prod')]
+down *ARGS:
+    docker compose --env-file .env down {{ARGS}}
+
+[group('prod')]
+stop:
+    docker compose --env-file .env stop
+
+[group('prod')]
+build *ARGS:
+    docker compose --env-file .env build {{ARGS}}
+
+[group('prod')]
+rebuild:
+    docker compose --env-file .env build --no-cache
+
+[group('prod')]
+logs *SERVICE:
+    docker compose --env-file .env logs -f {{SERVICE}}
+
+[group('prod')]
+ps:
+    docker compose --env-file .env ps
+
+# =============================================================================
+# Docker Compose (Production + Cloudflare Tunnel)
+# =============================================================================
+
+[group('tunnel')]
+redeploy:
+    env -u APP_NAME -u VITE_APP_TITLE -u VITE_API_URL -u VITE_API_TARGET -u NGINX_HOST_PORT -u FRONTEND_HOST_PORT -u RUST_LOG -u COMPOSE_PROFILES docker compose --env-file .env -f compose.yml -f cloudflared.compose.yml --profile backend down --remove-orphans
+    env -u APP_NAME -u VITE_APP_TITLE -u VITE_API_URL -u VITE_API_TARGET -u NGINX_HOST_PORT -u FRONTEND_HOST_PORT -u RUST_LOG -u COMPOSE_PROFILES docker compose --env-file .env -f compose.yml -f cloudflared.compose.yml --profile backend build
+    env -u APP_NAME -u VITE_APP_TITLE -u VITE_API_URL -u VITE_API_TARGET -u NGINX_HOST_PORT -u FRONTEND_HOST_PORT -u RUST_LOG -u COMPOSE_PROFILES docker compose --env-file .env -f compose.yml -f cloudflared.compose.yml --profile backend up -d --remove-orphans
+
+[group('tunnel')]
+tunnel-up *ARGS:
+    docker compose --env-file .env -f compose.yml -f cloudflared.compose.yml up {{ARGS}}
+
+[group('tunnel')]
+tunnel-start *ARGS:
+    docker compose --env-file .env -f compose.yml -f cloudflared.compose.yml up -d {{ARGS}}
+
+[group('tunnel')]
+tunnel-down *ARGS:
+    docker compose --env-file .env -f compose.yml -f cloudflared.compose.yml down {{ARGS}}
+
+[group('tunnel')]
+tunnel-logs:
+    docker compose --env-file .env -f compose.yml -f cloudflared.compose.yml logs -f cloudflared
+
+# =============================================================================
+# Docker Compose (Development)
+# =============================================================================
+
+[group('dev')]
+dev-up *ARGS:
+    docker compose -f dev.compose.yml up {{ARGS}}
+
+[group('dev')]
+dev-start *ARGS:
+    docker compose -f dev.compose.yml up -d {{ARGS}}
+
+[group('dev')]
+dev-down *ARGS:
+    docker compose -f dev.compose.yml down {{ARGS}}
+
+[group('dev')]
+dev-stop:
+    docker compose -f dev.compose.yml stop
+
+[group('dev')]
+dev-build *ARGS:
+    docker compose -f dev.compose.yml build {{ARGS}}
+
+[group('dev')]
+dev-rebuild:
+    docker compose -f dev.compose.yml build --no-cache
+
+[group('dev')]
+dev-logs *SERVICE:
+    docker compose -f dev.compose.yml logs -f {{SERVICE}}
+
+[group('dev')]
+dev-ps:
+    docker compose -f dev.compose.yml ps
+
+# =============================================================================
+# Docker Compose (with backend profile)
+# =============================================================================
+
+[group('backend')]
+dev-up-backend *ARGS:
+    docker compose -f dev.compose.yml --profile backend up {{ARGS}}
+
+[group('backend')]
+up-backend *ARGS:
+    docker compose --env-file .env --profile backend up {{ARGS}}
+
+# =============================================================================
+# Utilities
+# =============================================================================
+
+[group('util')]
+init:
+    bash scripts/init.sh
+
+[group('util')]
+ports:
+    bash scripts/randomize-ports.sh
+
+[group('util')]
+info:
+    @echo "Project: {{project}}"
+    @echo "Version: {{version}}"
+    @echo "OS: {{os()}} ({{arch()}})"
+
+[group('util')]
+clean:
+    -rm -rf frontend/.biome_cache
+    @echo "Cache directories cleaned"

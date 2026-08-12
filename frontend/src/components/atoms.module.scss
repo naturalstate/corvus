@@ -1,0 +1,72 @@
+// ===================
+// ©AngelaMos | 2026
+// atoms.module.scss
+// ===================
+
+@use 'index' as *;
+
+%tag {
+  display: inline-flex;
+  align-items: center;
+  font-family: $font-mono;
+  font-size: $font-size-3xs;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.sev {
+  @extend %tag;
+
+  padding: 0 6px;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  background: rgb(0, 0, 0, 35%);
+}
+
+.cat {
+  @extend %tag;
+
+  padding: 0 5px;
+  font-size: $font-size-2xs;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  opacity: 0.92;
+}
+
+.verdict {
+  @extend %tag;
+
+  padding: 1px 7px;
+  color: $void;
+  background: var(--accent);
+  box-shadow: 0 0 9px -7px var(--accent);
+}
+
+.rule {
+  @extend %tag;
+
+  color: $paper;
+  letter-spacing: 0.1em;
+}
+
+.kind {
+  font-family: $font-mono;
+  font-size: $font-size-3xs;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $dust;
+
+  &::before {
+    content: '[';
+    color: $soot;
+  }
+
+  &::after {
+    content: ']';
+    color: $soot;
+  }
+}

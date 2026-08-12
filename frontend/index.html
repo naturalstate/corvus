@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!--
+  Corvus — passive TLS fingerprinting sensor
+  Fork of tlsfp by CarterPerez-dev. AGPL-3.0.
+-->
+    <meta charset="UTF-8" />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="/assets/favicon.ico"
+    />
+    <link
+      rel="apple-touch-icon"
+      type="image/png"
+      href="/assets/apple-touch-icon.png"
+    />
+    <link
+      rel="manifest"
+      href="/assets/site.webmanifest"
+    />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; form-action 'self'; worker-src 'self' blob:;"
+    />
+    <title>Corvus</title>
+    <meta
+      name="description"
+      content="Passive TLS fingerprinting sensor. JA3, JA4, JA4S, JA4H, JA4X, and JA4T over TCP and QUIC."
+    />
+    <meta
+      property="og:type"
+      content="website"
+    />
+    <meta
+      property="og:site_name"
+      content="Corvus"
+    />
+    <meta
+      property="og:title"
+      content="Corvus"
+    />
+    <meta
+      property="og:description"
+      content="Passive TLS fingerprinting sensor. JA3, JA4, JA4S, JA4H, JA4X, and JA4T over TCP and QUIC."
+    />
+    <meta
+      name="twitter:card"
+      content="summary"
+    />
+    <meta
+      name="twitter:title"
+      content="Corvus"
+    />
+    <meta
+      name="twitter:description"
+      content="Passive TLS fingerprinting sensor. JA3, JA4, JA4S, JA4H, JA4X, and JA4T over TCP and QUIC."
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script
+      type="module"
+      src="/src/main.tsx"
+    ></script>
+  </body>
+</html>

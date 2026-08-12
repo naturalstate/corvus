@@ -1,0 +1,12 @@
+# ©AngelaMos | 2026
+# .dockerignore
+
+target/
+**/node_modules/
+**/dist/
+.git/
+docs/
+*.db
+*.sqlite
+.env
+.env.development

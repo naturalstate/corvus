@@ -1,0 +1,38 @@
+# ©AngelaMos | 2026
+# Cargo.toml
+
+[package]
+name = "tlsfp-core"
+description = "TLS handshake parsing and JA3/JA4 fingerprint computation"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+md-5.workspace = true
+sha2.workspace = true
+hex.workspace = true
+smallvec.workspace = true
+thiserror.workspace = true
+serde.workspace = true
+etherparse.workspace = true
+pcap-parser.workspace = true
+hkdf.workspace = true
+aes.workspace = true
+aes-gcm.workspace = true
+
+[dev-dependencies]
+hex.workspace = true
+proptest = "1"
+serde_json.workspace = true
+criterion = { version = "0.5", default-features = false, features = ["cargo_bench_support"] }
+
+[[bench]]
+name = "fingerprint"
+harness = false

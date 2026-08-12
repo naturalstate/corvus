@@ -1,0 +1,20 @@
+# ©AngelaMos | 2026
+# .gitignore
+
+docs/
+target/
+*.db
+*.sqlite
+fuzz/corpus/
+fuzz/artifacts/
+
+.env
+.env.development
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+.biome_cache/
+
+# Claude Code machine-local config
+.claude/settings.local.json

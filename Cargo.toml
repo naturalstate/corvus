@@ -1,0 +1,69 @@
+# ©AngelaMos | 2026
+# Cargo.toml
+
+[workspace]
+resolver = "3"
+members = ["crates/tlsfp-core", "crates/tlsfp-intel", "crates/tlsfp"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "AGPL-3.0-only"
+authors = ["Carter Perez", "naturalstate"]
+repository = "https://github.com/naturalstate/corvus"
+
+[workspace.dependencies]
+tlsfp-core = { path = "crates/tlsfp-core" }
+tlsfp-intel = { path = "crates/tlsfp-intel" }
+
+winnow = "0.7"
+md-5 = "0.10"
+sha2 = "0.10"
+hex = "0.4"
+smallvec = "1"
+thiserror = "2"
+anyhow = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+etherparse = "0.18"
+pcap-parser = "0.16"
+pcap = "2"
+
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "signal", "time", "net"] }
+tokio-stream = { version = "0.1", features = ["sync"] }
+flume = "0.11"
+rustix = { version = "1", features = ["std", "event"] }
+
+rusqlite = { version = "0.32", features = ["bundled"] }
+csv = "1"
+
+axum = "0.8"
+tower-http = { version = "0.6", features = ["fs", "trace", "cors", "compression-br", "compression-gzip", "set-header"] }
+tower = "0.5"
+
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+clap = { version = "4", features = ["derive"] }
+
+hkdf = "0.12"
+aes = "0.8"
+aes-gcm = "0.10"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+module_name_repetitions = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+must_use_candidate = "allow"
+doc_markdown = "allow"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1

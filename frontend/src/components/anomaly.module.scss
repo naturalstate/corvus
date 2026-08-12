@@ -1,0 +1,140 @@
+// ===================
+// ©AngelaMos | 2026
+// anomaly.module.scss
+// ===================
+
+@use 'index' as *;
+
+.frame {
+  height: 100%;
+  min-height: 280px;
+}
+
+.body {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $space-2-5;
+  padding: $space-3;
+  overflow-y: auto;
+}
+
+// When anomalies are present the snake bleeds in from the lower edge, the
+// predator the hot panel is watching.
+.armed::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 78%;
+  height: 60%;
+  background: url('/assets/objects/xray-lily.png') right bottom / contain no-repeat;
+  opacity: 0.13;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.card {
+  position: relative;
+  z-index: 1;
+  padding: $space-3;
+  background: rgb(8, 9, 10, 82%);
+  border: 1px solid $line;
+  border-left: 2px solid var(--accent);
+  box-shadow: 0 0 20px -10px var(--accent);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-2;
+  margin-bottom: $space-1-5;
+}
+
+.headline {
+  font-family: $font-grotesk;
+  font-size: $font-size-base;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: $chalk;
+  text-shadow: 0 0 11px rgb(255, 77, 18, 18%);
+}
+
+.subject {
+  @include truncate;
+
+  font-family: $font-mono;
+  font-size: $font-size-xs;
+  color: var(--accent);
+}
+
+.evidence {
+  margin-top: $space-2;
+  font-family: $font-mono;
+  font-size: $font-size-3xs;
+  line-height: 1.55;
+  color: $ash;
+}
+
+.foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: $space-2-5;
+  padding-top: $space-2;
+  border-top: 1px solid $line-faint;
+}
+
+.rule {
+  font-family: $font-mono;
+  font-size: $font-size-3xs;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.time {
+  font-family: $font-mono;
+  font-size: $font-size-3xs;
+  color: $dust;
+}
+
+.clean {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-2;
+  text-align: center;
+  padding: $space-6;
+}
+
+.reticle {
+  --dot: #{$thermal};
+
+  width: 64px;
+  height: 64px;
+  margin-bottom: $space-2;
+  opacity: 0.7;
+}
+
+.cleanLine {
+  font-family: $font-mono;
+  font-size: $font-size-xs;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: $thermal;
+}
+
+.cleanSub {
+  max-width: 28ch;
+  font-family: $font-mono;
+  font-size: $font-size-3xs;
+  line-height: 1.5;
+  color: $soot;
+}

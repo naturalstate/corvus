@@ -1,0 +1,191 @@
+// ===================
+// ©AngelaMos | 2026
+// landing.module.scss
+// ===================
+
+@use 'index' as *;
+
+.page {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100dvh;
+  padding: clamp($space-5, 5vw, $space-12);
+  overflow: hidden;
+}
+
+// The biometric specimen, bled in from the right on screen blend so its black
+// dissolves into the page and only the x-rayed wings remain.
+.specimen {
+  position: absolute;
+  top: 50%;
+  right: -6%;
+  width: clamp(420px, 56vw, 880px);
+  transform: translateY(-50%);
+  mix-blend-mode: screen;
+  opacity: 0.92;
+  filter: drop-shadow(0 0 60px rgb(47, 123, 255, 28%));
+  pointer-events: none;
+  z-index: 0;
+
+  @include breakpoint-down('lg') {
+    opacity: 0.6;
+    right: -16%;
+  }
+
+  @include breakpoint-down('md') {
+    opacity: 0.3;
+    right: -24%;
+  }
+
+  @include breakpoint-down('sm') {
+    opacity: 0.16;
+  }
+}
+
+.scan {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  @include scanlines(0.04);
+}
+
+.markTL,
+.markTR,
+.markBL,
+.markBR {
+  position: absolute;
+  z-index: 2;
+}
+
+.markTL {
+  top: $space-5;
+  left: $space-5;
+}
+
+.markTR {
+  top: $space-5;
+  right: $space-5;
+}
+
+.markBL {
+  bottom: $space-5;
+  left: $space-5;
+}
+
+.markBR {
+  bottom: $space-5;
+  right: $space-5;
+}
+
+.head,
+.center,
+.foot {
+  position: relative;
+  z-index: 3;
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  font-family: $font-mono;
+  font-size: $font-size-3xs;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: $dust;
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 80ch;
+  padding-block: $space-8;
+}
+
+.over {
+  font-family: $font-mono;
+  font-size: $font-size-xs;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: $fire;
+  text-shadow: 0 0 10px rgb(255, 77, 18, 28%);
+  margin-bottom: $space-6;
+}
+
+.title {
+  font-family: $font-display;
+  font-size: clamp(5rem, 18vw, 13rem);
+  line-height: 0.82;
+  letter-spacing: 0.01em;
+  color: $chalk;
+  margin: 0 0 $space-7;
+  text-shadow: 0 0 48px rgb(47, 123, 255, 16%);
+}
+
+// The thesis runs wider and thinner than the title, a long low band of prose
+// reaching toward the specimen rather than a narrow stacked column.
+.thesis {
+  max-width: clamp(54ch, 30vw + 17ch, 76ch);
+  margin-top: 0;
+  font-size: $font-size-base;
+  line-height: 1.6;
+  color: $paper;
+  text-wrap: pretty;
+}
+
+// Resting orange slab. Hover is a near-imperceptible warm lift, the click a
+// 1px settle with a hair of dim: present enough to feel, never a colour flip.
+.enter {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2-5;
+  margin-top: $space-10;
+  padding: $space-3 $space-5;
+  font-family: $font-mono;
+  font-size: $font-size-sm;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: $void;
+  background: $fire;
+  text-decoration: none;
+  transition:
+    filter $duration-fast $ease-out,
+    transform $duration-fast $ease-out;
+
+  @include hover {
+    filter: brightness(1.07);
+  }
+
+  &:active {
+    transform: translateY(1px);
+    filter: brightness(0.95);
+  }
+}
+
+.enterMark {
+  font-weight: 700;
+}
+
+.foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-2 $space-6;
+}
+
+.note {
+  font-family: $font-mono;
+  font-size: $font-size-3xs;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: $dust;
+
+  &::before {
+    content: '+ ';
+    color: $soot;
+  }
+}

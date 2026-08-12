@@ -1,0 +1,119 @@
+// ===================
+// ©AngelaMos | 2026
+// scope.module.scss
+// ===================
+
+@use 'index' as *;
+
+.page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $space-5;
+  padding: clamp($space-4, 3vw, $space-8);
+  max-width: 1640px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.masthead {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: $space-5;
+  padding-bottom: $space-4;
+  border-bottom: 1px solid $line;
+  overflow: hidden;
+
+  @include breakpoint-down('lg') {
+    grid-template-columns: 1fr;
+  }
+}
+
+.butterfly {
+  position: absolute;
+  top: 50%;
+  left: 36%;
+  width: 360px;
+  transform: translateY(-50%);
+  mix-blend-mode: screen;
+  opacity: 0.16;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.headText {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.over {
+  display: block;
+  font-family: $font-mono;
+  font-size: $font-size-3xs;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: $fire;
+  margin-bottom: $space-3;
+}
+
+.title {
+  font-family: $font-display;
+  font-size: clamp(2.6rem, 6vw, 4.5rem);
+  line-height: 0.9;
+  color: $bone;
+  margin: 0 0 $space-3-5;
+}
+
+.sub {
+  max-width: 52ch;
+  font-size: $font-size-sm;
+  line-height: 1.5;
+  color: $ash;
+}
+
+.stats {
+  position: relative;
+  z-index: 1;
+  min-width: min(560px, 100%);
+}
+
+.grid {
+  flex: 1;
+  display: grid;
+  grid-template:
+    'live anomaly' minmax(300px, auto)
+    'live dist' minmax(260px, auto)
+    'alerts alerts' auto
+    / minmax(0, 1.62fr) minmax(0, 1fr);
+  gap: $space-4;
+
+  @include breakpoint-down('lg') {
+    grid-template:
+      'live'
+      'anomaly'
+      'dist'
+      'alerts'
+      / 1fr;
+  }
+}
+
+.live {
+  grid-area: live;
+}
+
+.anomaly {
+  grid-area: anomaly;
+}
+
+.dist {
+  grid-area: dist;
+}
+
+.alerts {
+  grid-area: alerts;
+  min-height: 300px;
+  max-height: 440px;
+}

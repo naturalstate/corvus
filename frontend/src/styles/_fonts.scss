@@ -1,0 +1,25 @@
+// ===================
+// ©AngelaMos | 2026
+// _fonts.scss
+// ===================
+
+// Family variables only. The @font-face block that loads the self hosted files
+// lives in styles.scss so it is emitted once, not duplicated into every module
+// that needs a family name.
+
+// Anton: the heavy condensed poster face, for mastheads and the one or two
+// words that are meant to be read across the room.
+$font-display: 'Anton', 'Arial Narrow', 'Helvetica Neue', sans-serif;
+
+// Space Grotesk: the working face for prose, labels, and controls.
+$font-grotesk: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+  Roboto, Arial, sans-serif;
+
+// Geist Mono: the instrument face. Timestamps, coordinates, fingerprints, every
+// column of data that wants to read like it came off a scanner.
+$font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo,
+  Consolas, monospace;
+
+// Retained system stacks for anything that explicitly wants them.
+$font-sans: $font-grotesk;
+$font-mono-system: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;

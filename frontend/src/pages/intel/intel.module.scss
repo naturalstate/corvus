@@ -1,0 +1,184 @@
+// ===================
+// ©AngelaMos | 2026
+// intel.module.scss
+// ===================
+
+@use 'index' as *;
+
+.page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: $space-5;
+  padding: clamp($space-4, 3vw, $space-8);
+  max-width: 1640px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.head {
+  position: relative;
+  padding-bottom: $space-4;
+  border-bottom: 1px solid $line;
+  overflow: hidden;
+}
+
+.lily {
+  position: absolute;
+  top: 50%;
+  right: 1%;
+  height: 150%;
+  transform: translateY(-50%);
+  mix-blend-mode: screen;
+  opacity: 0.5;
+  filter: drop-shadow(0 0 40px rgb(47, 123, 255, 30%));
+  pointer-events: none;
+  z-index: 0;
+
+  @include breakpoint-down('md') {
+    opacity: 0.22;
+  }
+}
+
+.headText {
+  position: relative;
+  z-index: 1;
+}
+
+.over {
+  display: block;
+  font-family: $font-mono;
+  font-size: $font-size-3xs;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: $thermal;
+  margin-bottom: $space-3;
+}
+
+.title {
+  font-family: $font-display;
+  font-size: clamp(2.6rem, 6vw, 4.5rem);
+  line-height: 0.9;
+  color: $bone;
+  margin: 0 0 $space-3-5;
+}
+
+.sub {
+  max-width: 56ch;
+  font-size: $font-size-sm;
+  line-height: 1.5;
+  color: $ash;
+}
+
+.grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+  gap: $space-4;
+  align-items: start;
+
+  @include breakpoint-down('lg') {
+    grid-template-columns: 1fr;
+  }
+}
+
+.search {
+  min-height: 540px;
+  height: 100%;
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.feedList {
+  list-style: none;
+  padding: $space-2;
+}
+
+.feed {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-3;
+  padding: $space-2-5 $space-2;
+  border-bottom: 1px solid $line-faint;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.feedName {
+  @include truncate;
+
+  font-family: $font-mono;
+  font-size: $font-size-2xs;
+  color: $paper;
+}
+
+.feedMeta {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  flex-shrink: 0;
+}
+
+.license {
+  font-family: $font-mono;
+  font-size: $font-size-3xs;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $dust;
+}
+
+.records {
+  font-family: $font-mono;
+  font-size: $font-size-2xs;
+  font-weight: 700;
+  color: $thermal;
+}
+
+.exportBody {
+  padding: $space-3;
+}
+
+.exportNote {
+  font-size: $font-size-2xs;
+  line-height: 1.55;
+  color: $ash;
+}
+
+.exportBtns {
+  display: flex;
+  gap: $space-3;
+  margin-top: $space-3;
+}
+
+.exportBtn {
+  flex: 1;
+  padding: $space-2-5;
+  text-align: center;
+  font-family: $font-mono;
+  font-size: $font-size-xs;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: $bone;
+  background: $ink-700;
+  border: 1px solid $line;
+  text-decoration: none;
+  @include transition-fast;
+
+  @include hover {
+    color: $thermal;
+    background: $ink-600;
+    border-color: $line-strong;
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+}

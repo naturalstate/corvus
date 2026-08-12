@@ -1,0 +1,122 @@
+// ===================
+// ©AngelaMos | 2026
+// _anti.scss
+// ===================
+
+// The surveillance-scan palette. The ground is true black; everything organic
+// and alive glows against it. Colour is rare and means something: the hot
+// channels are reserved for the signal the scan reveals, the cold channels for
+// the instrument itself. Neutral type sits between.
+
+// The void and the panels lifted just off it.
+$void: #000;
+$ink-1000: #050506;
+$ink-900: #0a0b0d;
+$ink-800: #0f1113;
+$ink-700: #15181b;
+$ink-600: #1c2024;
+$ink-500: #262b30;
+
+// Bone white for the artifacts, chalk for the few things that must shout.
+$chalk: #fff;
+$bone: #f2f0e9;
+$paper: #d8d6cd;
+
+// The instrument's own dim labels, the small print on a scan sheet.
+$ash: #8b8f95;
+$dust: #5a5f65;
+$soot: #34383d;
+
+// Hairlines. The grid the specimens are pinned to.
+$line-faint: rgb(255, 255, 255, 6%);
+$line: rgb(255, 255, 255, 11%);
+$line-strong: rgb(255, 255, 255, 20%);
+$line-hot: rgb(255, 77, 18, 55%);
+
+// The hot channels: what the x-ray exposes, what bleeds through the black.
+$fire: #ff4d12; // the butterfly's fire, the snake; primary anomaly
+$fire-soft: #ff7a45;
+$blood: #ff2733; // the wolf, the critical
+$magma: #ffae3a; // amber, the medium warning
+$volt: #2f7bff; // x-ray blue, the cold signal, information
+$volt-soft: #6ea3ff;
+$thermal: #14e7d2; // specimen-tag cyan, the benign-alive accent
+$orchid: #ff3ec8; // thermal magenta, the rare flag
+$acid: #c6ff2e; // used almost never, for the one thing that must sting
+
+// Semantic mappings. Severity, verdict, and category all draw from the channels
+// above so the whole console agrees on what a colour means.
+$sev-critical: $blood;
+$sev-high: $fire;
+$sev-medium: $magma;
+$sev-low: $volt;
+$sev-info: $ash;
+
+$verdict-malicious: $blood;
+$verdict-suspicious: $fire;
+$verdict-benign: $thermal;
+$verdict-unknown: $dust;
+
+$cat-malware: $blood;
+$cat-c2: $fire;
+$cat-tool: $magma;
+$cat-benign: $thermal;
+$cat-os: $volt;
+$cat-unknown: $dust;
+
+// The length of a registration crop mark and the weight of a hairline rule.
+$crop-len: 11px;
+$crop-weight: 1.5px;
+
+// A hot glow, the look of a signal burning through the panel. Kept faint on
+// purpose so it reads as emission, never as a web-app drop shadow.
+@mixin glow($color, $strength: 0.5) {
+  box-shadow:
+    0 0 0 1px rgba($color, 0.4),
+    0 0 11px -5px rgba($color, $strength),
+    inset 0 0 20px -16px rgba($color, $strength);
+}
+
+@mixin text-glow($color, $strength: 0.4) {
+  color: $color;
+  text-shadow: 0 0 9px rgba($color, $strength);
+}
+
+// Crop-mark corners drawn with two crossing gradients per corner, the frame a
+// specimen is pinned inside. The element needs position context.
+@mixin crop-corners($color: $line-strong, $len: $crop-len, $w: $crop-weight) {
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  &::before {
+    background:
+      linear-gradient($color, $color) left top / $len $w no-repeat,
+      linear-gradient($color, $color) left top / $w $len no-repeat,
+      linear-gradient($color, $color) right top / $len $w no-repeat,
+      linear-gradient($color, $color) right top / $w $len no-repeat;
+  }
+
+  &::after {
+    background:
+      linear-gradient($color, $color) left bottom / $len $w no-repeat,
+      linear-gradient($color, $color) left bottom / $w $len no-repeat,
+      linear-gradient($color, $color) right bottom / $len $w no-repeat,
+      linear-gradient($color, $color) right bottom / $w $len no-repeat;
+  }
+}
+
+// The faint diagonal scan texture, the grain of a printed dossier.
+@mixin scanlines($opacity: 0.035) {
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, $opacity) 0,
+    rgba(255, 255, 255, $opacity) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}

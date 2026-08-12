@@ -1,0 +1,89 @@
+// ===================
+// ©AngelaMos | 2026
+// distribution.module.scss
+// ===================
+
+@use 'index' as *;
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: $space-5;
+  padding: $space-4;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1-5;
+}
+
+.groupHead {
+  margin-bottom: $space-1;
+  padding-bottom: $space-1-5;
+  border-bottom: 1px solid $line-faint;
+  font-family: $font-mono;
+  font-size: $font-size-3xs;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: $ash;
+}
+
+.bar {
+  display: grid;
+  grid-template-columns: 92px 1fr 42px;
+  align-items: center;
+  gap: $space-3;
+}
+
+.barLabel {
+  @include truncate;
+
+  font-family: $font-mono;
+  font-size: $font-size-3xs;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.track {
+  position: relative;
+  height: 11px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0,
+      transparent 7px,
+      rgb(255, 255, 255, 3%) 7px,
+      rgb(255, 255, 255, 3%) 8px
+    ),
+    $ink-700;
+  border: 1px solid $line-faint;
+}
+
+.fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--accent);
+  box-shadow:
+    0 0 7px -4px var(--accent),
+    inset -1px 0 0 rgb(255, 255, 255, 30%);
+  transition: width $duration-slow $ease-out;
+}
+
+.value {
+  font-family: $font-mono;
+  font-size: $font-size-3xs;
+  font-weight: 700;
+  text-align: right;
+  color: $paper;
+}
+
+.empty {
+  padding: $space-2 0;
+  font-family: $font-mono;
+  font-size: $font-size-3xs;
+  letter-spacing: 0.08em;
+  color: $soot;
+}

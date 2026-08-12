@@ -1,0 +1,218 @@
+// ===================
+// ©AngelaMos | 2026
+// styles.scss
+// ===================
+
+@use 'styles/index' as *;
+@use 'styles/reset';
+
+// The instrument faces, self hosted so the dossier loads on a dark, offline
+// link with no third party fetch. Loaded once, here.
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/space-grotesk-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/space-grotesk-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/space-grotesk-700.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/geist-mono-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/geist-mono-700.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: Anton;
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/anton-400.woff2') format('woff2');
+}
+
+html {
+  background-color: $void;
+}
+
+body {
+  background-color: $void;
+  color: $bone;
+  font-family: $font-grotesk;
+  font-size: $font-size-sm;
+  letter-spacing: 0.01em;
+
+  // A breath of grain over the whole field so the black reads as a printed
+  // surface, not a switched-off screen.
+  background-image:
+    radial-gradient(
+      ellipse 120% 80% at 50% -10%,
+      rgb(47, 123, 255, 5%),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 90% 60% at 100% 110%,
+      rgb(255, 77, 18, 4%),
+      transparent 55%
+    );
+  background-attachment: fixed;
+}
+
+::selection {
+  background: rgb(255, 77, 18, 85%);
+  color: $void;
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: $void;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $ink-600;
+  border: 2px solid $void;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: $soot;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: $ink-600 $void;
+}
+
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  isolation: isolate;
+}
+
+.app {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+// A small utility for screen-reader-only labels, used by the icon controls.
+.visually-hidden {
+  @include sr-only;
+}
+
+// The accent channel. A component tags an element with what a value means and
+// reads the colour back as one custom property, so the whole console agrees on
+// what red, orange, and blue stand for from a single place.
+[data-sev='info'] {
+  --accent: #{$sev-info};
+}
+
+[data-sev='low'] {
+  --accent: #{$sev-low};
+}
+
+[data-sev='medium'] {
+  --accent: #{$sev-medium};
+}
+
+[data-sev='high'] {
+  --accent: #{$sev-high};
+}
+
+[data-sev='critical'] {
+  --accent: #{$sev-critical};
+}
+
+[data-verdict='malicious'] {
+  --accent: #{$verdict-malicious};
+}
+
+[data-verdict='suspicious'] {
+  --accent: #{$verdict-suspicious};
+}
+
+[data-verdict='benign'] {
+  --accent: #{$verdict-benign};
+}
+
+[data-verdict='unknown'] {
+  --accent: #{$verdict-unknown};
+}
+
+[data-cat='malware'] {
+  --accent: #{$cat-malware};
+}
+
+[data-cat='c2'] {
+  --accent: #{$cat-c2};
+}
+
+[data-cat='tool'] {
+  --accent: #{$cat-tool};
+}
+
+[data-cat='benign'] {
+  --accent: #{$cat-benign};
+}
+
+[data-cat='os'] {
+  --accent: #{$cat-os};
+}
+
+[data-cat='unknown'] {
+  --accent: #{$cat-unknown};
+}
+
+[data-rule='known_bad'] {
+  --accent: #{$blood};
+}
+
+[data-rule='ua_mismatch'] {
+  --accent: #{$fire};
+}
+
+[data-rule='os_mismatch'] {
+  --accent: #{$magma};
+}
+
+[data-rule='fp_rotation'] {
+  --accent: #{$volt};
+}
+
+[data-rule='monoculture'] {
+  --accent: #{$orchid};
+}
+
+[data-rule='first_seen'] {
+  --accent: #{$thermal};
+}

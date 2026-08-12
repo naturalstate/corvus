@@ -1,0 +1,170 @@
+// ===================
+// ©AngelaMos | 2026
+// marks.module.scss
+// ===================
+
+@use 'index' as *;
+
+.reg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: $dust;
+  stroke-width: 1;
+}
+
+.reticle {
+  --dot: #{$fire};
+
+  width: 56px;
+  height: 56px;
+  fill: none;
+  stroke: $line-strong;
+  stroke-width: 1;
+
+  circle:nth-child(2) {
+    fill: var(--dot);
+    stroke: none;
+  }
+}
+
+.frame {
+  --crop: #{$line-strong};
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background:
+    linear-gradient(180deg, $ink-900, $ink-1000);
+  border: 1px solid $line;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  &::before {
+    background:
+      linear-gradient(var(--crop), var(--crop)) left top / $crop-len
+        $crop-weight no-repeat,
+      linear-gradient(var(--crop), var(--crop)) left top / $crop-weight
+        $crop-len no-repeat,
+      linear-gradient(var(--crop), var(--crop)) right top / $crop-len
+        $crop-weight no-repeat,
+      linear-gradient(var(--crop), var(--crop)) right top / $crop-weight
+        $crop-len no-repeat;
+  }
+
+  &::after {
+    background:
+      linear-gradient(var(--crop), var(--crop)) left bottom / $crop-len
+        $crop-weight no-repeat,
+      linear-gradient(var(--crop), var(--crop)) left bottom / $crop-weight
+        $crop-len no-repeat,
+      linear-gradient(var(--crop), var(--crop)) right bottom / $crop-len
+        $crop-weight no-repeat,
+      linear-gradient(var(--crop), var(--crop)) right bottom / $crop-weight
+        $crop-len no-repeat;
+  }
+}
+
+.hot {
+  --crop: #{$fire};
+
+  border-color: $line-hot;
+  @include glow($fire, 0.22);
+}
+
+.span {
+  grid-column: 1 / -1;
+}
+
+.frameHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-3;
+  padding: $space-2 $space-3;
+  border-bottom: 1px solid $line-faint;
+}
+
+.frameLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  font-family: $font-mono;
+  font-size: $font-size-3xs;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: $ash;
+
+  &::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    background: var(--crop);
+  }
+}
+
+.hot .frameLabel {
+  color: $fire-soft;
+}
+
+.frameAside {
+  font-family: $font-mono;
+  font-size: $font-size-3xs;
+  letter-spacing: 0.16em;
+  color: $dust;
+  white-space: nowrap;
+}
+
+.frameBody {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+
+.ticker {
+  overflow: hidden;
+  white-space: nowrap;
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 4%,
+    #000 96%,
+    transparent
+  );
+}
+
+.tickerLane {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-6;
+  padding-block: $space-1-5;
+  animation: ticker-scroll 44s linear infinite;
+}
+
+.tickerItem {
+  font-family: $font-mono;
+  font-size: $font-size-3xs;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: $dust;
+
+  &::before {
+    content: '// ';
+    color: $soot;
+  }
+}
+
+@keyframes ticker-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}

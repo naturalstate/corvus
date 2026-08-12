@@ -1,0 +1,12 @@
+// ===================
+// ©AngelaMos | 2026
+// _index.scss
+// ===================
+
+// One import surface for every module. Forwards only definitions, never rules,
+// so `@use 'index' as *` in any module costs nothing at the output.
+
+@forward 'tokens';
+@forward 'anti';
+@forward 'fonts';
+@forward 'mixins';

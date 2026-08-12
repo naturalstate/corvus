@@ -1,0 +1,66 @@
+// ===================
+// ©AngelaMos | 2026
+// stat-cluster.module.scss
+// ===================
+
+@use 'index' as *;
+
+.cluster {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid $line;
+  background: linear-gradient(180deg, $ink-900, $ink-1000);
+
+  @include breakpoint-down('md') {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.stat {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+  padding: $space-4 $space-4 $space-3;
+  border-right: 1px solid $line-faint;
+
+  &:last-child {
+    border-right: none;
+  }
+
+  @include breakpoint-down('md') {
+    &:nth-child(2n) {
+      border-right: none;
+    }
+
+    &:nth-child(-n + 2) {
+      border-bottom: 1px solid $line-faint;
+    }
+  }
+}
+
+.value {
+  font-family: $font-display;
+  font-size: $font-size-4xl;
+  line-height: 0.92;
+  letter-spacing: 0.01em;
+  color: $bone;
+  font-feature-settings: 'tnum' 1;
+}
+
+.label {
+  margin-top: $space-1-5;
+  font-family: $font-mono;
+  font-size: $font-size-3xs;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: $fire-soft;
+}
+
+.sub {
+  font-family: $font-mono;
+  font-size: $font-size-3xs;
+  letter-spacing: 0.06em;
+  color: $soot;
+}
