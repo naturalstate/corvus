@@ -58,7 +58,7 @@ pub fn draw(frame: &mut Frame, state: &AppState) {
     } else {
         let body = Layout::default()
             .direction(Direction::Horizontal)
-            .constraints([Constraint::Percentage(58), Constraint::Percentage(42)])
+            .constraints([Constraint::Percentage(75), Constraint::Percentage(25)])
             .split(rows[1]);
         stream(frame, body[0], state);
 
@@ -127,11 +127,40 @@ fn header(frame: &mut Frame, area: Rect, state: &AppState) {
     ]);
     frame.render_widget(summary, cols[0]);
 
-    let data: Vec<u64> = state.rate.iter().copied().collect();
-    let spark = Sparkline::default()
-        .data(&data)
-        .style(Style::default().fg(theme::BLUE_DEEP));
-    frame.render_widget(spark, cols[1]);
+    // One row of label above the trace, so it reads as a chart rather than as
+    // stray blocks in the corner.
+    let right = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([Constraint::Length(1), Constraint::Min(0)])
+        .split(cols[1]);
+
+    let peak = state.rate.iter().copied().max().unwrap_or(0);
+    frame.render_widget(
+        Paragraph::new(Line::from(vec![
+            Span::styled("handshakes/s", theme::dim()),
+            Span::styled(
+                format!("   peak {peak}"),
+                Style::default().fg(theme::BLUE_DIM),
+            ),
+        ])),
+        right[0],
+    );
+
+    // Show only as much history as fits, most recent flush to the right edge,
+    // so the trace always fills its pane instead of trailing off into blanks.
+    let width = right[1].width as usize;
+    let data: Vec<u64> = state
+        .rate
+        .iter()
+        .skip(state.rate.len().saturating_sub(width))
+        .copied()
+        .collect();
+    frame.render_widget(
+        Sparkline::default()
+            .data(&data)
+            .style(Style::default().fg(theme::BLUE_DEEP)),
+        right[1],
+    );
 }
 
 fn stream(frame: &mut Frame, area: Rect, state: &AppState) {
@@ -158,8 +187,10 @@ fn stream(frame: &mut Frame, area: Rect, state: &AppState) {
             TRow::new(vec![
                 Cell::from(clock(row.ts_nanos)).style(theme::dim()),
                 Cell::from(row.kind),
-                Cell::from(truncate(&row.fingerprint, 34)),
-                Cell::from(truncate(row.sni.as_deref().unwrap_or("-"), 26)),
+                // A JA4 hash is 36 characters; give it the full width so the
+                // headline value is never the thing that gets elided.
+                Cell::from(truncate(&row.fingerprint, 38)),
+                Cell::from(truncate(row.sni.as_deref().unwrap_or("-"), 34)),
                 Cell::from(label_of(row)),
             ])
             .style(style)
@@ -171,9 +202,9 @@ fn stream(frame: &mut Frame, area: Rect, state: &AppState) {
         [
             Constraint::Length(12),
             Constraint::Length(13),
-            Constraint::Length(34),
+            Constraint::Length(38),
             Constraint::Min(14),
-            Constraint::Length(18),
+            Constraint::Length(20),
         ],
     )
     .header(
@@ -203,7 +234,7 @@ fn constellation(frame: &mut Frame, area: Rect, state: &AppState) {
         }
     }
 
-    let block = panel("constellation  ciphers × extensions", false);
+    let block = panel("constellation", false);
     let canvas = Canvas::default()
         .block(block)
         .marker(Marker::Braille)
@@ -273,7 +304,7 @@ fn divergence(frame: &mut Frame, area: Rect, state: &AppState) {
     ];
 
     let chart = Chart::new(datasets)
-        .block(panel("divergence  distinct hashes", false))
+        .block(panel("divergence", false))
         .x_axis(
             Axis::default()
                 .style(Style::default().fg(theme::BLUE_DIM))

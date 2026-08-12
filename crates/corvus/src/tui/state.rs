@@ -21,8 +21,10 @@ pub struct Observation {
 const MAX_ROWS: usize = 1_000;
 /// How many alerts are retained.
 const MAX_ALERTS: usize = 200;
-/// How many one-second buckets the throughput sparkline shows.
-const RATE_BUCKETS: usize = 120;
+/// How many one-second buckets of throughput history are kept. The sparkline
+/// slices the most recent screenful out of this, so it needs to be wider than
+/// any terminal rather than a fixed display length.
+const RATE_BUCKETS: usize = 600;
 /// How many divergence samples the JA3/JA4 chart shows.
 const MAX_DIVERGENCE: usize = 240;
 /// How long a constellation point takes to fade out.

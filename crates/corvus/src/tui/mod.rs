@@ -77,7 +77,12 @@ impl TerminalGuard {
             previous(info);
         }));
 
-        let terminal = Terminal::new(CrosstermBackend::new(out)).context("opening the terminal")?;
+        let mut terminal =
+            Terminal::new(CrosstermBackend::new(out)).context("opening the terminal")?;
+        // The alternate screen is not guaranteed to arrive blank, and ratatui
+        // only repaints cells it believes changed. Without this, whatever was
+        // on screen beforehand shows through every cell no widget covers.
+        terminal.clear().context("clearing the terminal")?;
         Ok((Self, terminal))
     }
 }
