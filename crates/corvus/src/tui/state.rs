@@ -285,6 +285,20 @@ impl AppState {
         self.ja4_seen.len()
     }
 
+    /// How many times more identities JA3 reports than JA4 for the same
+    /// population. With an extension-shuffling browser on the wire this climbs
+    /// without bound, which is the whole reason JA4 sorts before hashing.
+    pub fn inflation(&self) -> f64 {
+        let ja4 = self.ja4_seen.len();
+        if ja4 == 0 {
+            return 1.0;
+        }
+        #[allow(clippy::cast_precision_loss)]
+        {
+            self.ja3_seen.len() as f64 / ja4 as f64
+        }
+    }
+
     pub fn scroll(&mut self, delta: isize) {
         if self.rows.is_empty() {
             return;
@@ -328,7 +342,7 @@ fn best_label(reports: &[MatchReport]) -> (Option<String>, bool) {
 /// `t13d1516h2_…` is transport `t`, TLS 1.3, SNI present, **15** ciphers,
 /// **16** extensions, ALPN `h2`. Those two counts are the constellation's
 /// coordinates, which is why JA4's partly readable prefix is worth having.
-fn ja4_counts(hash: &str) -> Option<(u16, u16)> {
+pub fn ja4_counts(hash: &str) -> Option<(u16, u16)> {
     let prefix = hash.split('_').next()?;
     let ciphers = prefix.get(4..6)?.parse().ok()?;
     let extensions = prefix.get(6..8)?.parse().ok()?;

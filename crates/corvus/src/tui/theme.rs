@@ -23,6 +23,10 @@ pub const TEXT: Color = Color::Rgb(0xC6, 0xC6, 0xC6);
 /// Decay tails, disabled rows, secondary labels.
 pub const DIM: Color = Color::Rgb(0x58, 0x58, 0x58);
 
+/// The constellation lattice. Deliberately near the background: it should be
+/// felt as structure, not read as data.
+pub const GRID: Color = Color::Rgb(0x00, 0x2B, 0x40);
+
 /// Warnings only: a suspicious verdict, a rotation, a mismatch.
 pub const WARN: Color = Color::Rgb(0xD7, 0x5F, 0x00);
 /// Errors only: a known-bad hit, a malicious verdict.
@@ -43,11 +47,10 @@ pub fn title() -> Style {
     Style::default().fg(BLUE).add_modifier(Modifier::BOLD)
 }
 
-/// The row under the cursor.
+/// The row under the cursor. A reversed block reads as a heavy paint smear at
+/// this density; a bold row plus a gutter caret is lighter and easier to track.
 pub fn selected() -> Style {
-    Style::default()
-        .fg(PINK)
-        .add_modifier(Modifier::BOLD | Modifier::REVERSED)
+    Style::default().fg(PINK).add_modifier(Modifier::BOLD)
 }
 
 /// Body text.
@@ -58,4 +61,9 @@ pub fn text() -> Style {
 /// Secondary text.
 pub fn dim() -> Style {
     Style::default().fg(DIM)
+}
+
+/// In-canvas axis captions.
+pub fn axis() -> Style {
+    Style::default().fg(BLUE_DEEP)
 }

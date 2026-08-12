@@ -7,15 +7,15 @@ use ratatui::layout::{Alignment, Constraint, Direction, Layout, Rect};
 use ratatui::style::{Color, Modifier, Style};
 use ratatui::symbols::Marker;
 use ratatui::text::{Line, Span};
-use ratatui::widgets::canvas::{Canvas, Points};
+use ratatui::widgets::canvas::{Canvas, Line as CanvasLine, Points};
 use ratatui::widgets::{
-    Axis, Block, Borders, Cell, Chart, Dataset, GraphType, List, ListItem, Paragraph, Row as TRow,
-    Sparkline, Table,
+    Axis, Block, BorderType, Borders, Cell, Chart, Dataset, GraphType, List, ListItem, Paragraph,
+    Row as TRow, Sparkline, Table,
 };
 
 use corvus_intel::AlertSeverity;
 
-use super::state::{AppState, Focus, Row, Tone, ciphers_of, extensions_of};
+use super::state::{AppState, Focus, Row, Tone, ciphers_of, extensions_of, ja4_counts};
 use super::theme;
 
 /// The colour a row, point, or label is painted with.
@@ -31,12 +31,35 @@ fn tone_color(tone: Tone) -> Color {
 fn panel(title: &str, focused: bool) -> Block<'_> {
     Block::default()
         .borders(Borders::ALL)
+        .border_type(BorderType::Rounded)
         .border_style(if focused {
             theme::border_focus()
         } else {
             theme::border()
         })
-        .title(Span::styled(format!(" {title} "), theme::title()))
+        .title(Line::from(vec![
+            Span::styled(
+                "\u{2500}\u{25B8} ",
+                Style::default().fg(if focused {
+                    theme::PINK
+                } else {
+                    theme::BLUE_DEEP
+                }),
+            ),
+            Span::styled(format!("{title} "), theme::title()),
+        ]))
+}
+
+/// The gutter glyph for an event kind, so the stream scans by shape as well as
+/// by text: up for a client, down for a server.
+const fn kind_glyph(kind: &str) -> &'static str {
+    match kind.as_bytes() {
+        b"client_hello" => "\u{25B2}",
+        b"server_hello" => "\u{25BC}",
+        b"certificate" => "\u{25C6}",
+        b"http" => "\u{25C7}",
+        _ => "\u{00B7}",
+    }
 }
 
 pub fn draw(frame: &mut Frame, state: &AppState) {
@@ -123,6 +146,14 @@ fn header(frame: &mut Frame, area: Rect, state: &AppState) {
                 format!("{:<5}", state.distinct_ja4()),
                 Style::default().fg(theme::PINK),
             ),
+            // How many more identities JA3 invents for the same population.
+            // One number that says why JA4 replaced it.
+            Span::styled(
+                format!("\u{00D7}{:.1}", state.inflation()),
+                Style::default()
+                    .fg(theme::PINK)
+                    .add_modifier(Modifier::BOLD),
+            ),
         ]),
     ]);
     frame.render_widget(summary, cols[0]);
@@ -184,7 +215,16 @@ fn stream(frame: &mut Frame, area: Rect, state: &AppState) {
             } else {
                 base
             };
+            let gutter = if index == state.selected {
+                Span::styled("\u{258C}", Style::default().fg(theme::PINK))
+            } else {
+                Span::styled(
+                    kind_glyph(row.kind),
+                    Style::default().fg(tone_color(row.tone)),
+                )
+            };
             TRow::new(vec![
+                Cell::from(gutter),
                 Cell::from(clock(row.ts_nanos)).style(theme::dim()),
                 Cell::from(row.kind),
                 // A JA4 hash is 36 characters; give it the full width so the
@@ -200,6 +240,7 @@ fn stream(frame: &mut Frame, area: Rect, state: &AppState) {
     let table = Table::new(
         rows,
         [
+            Constraint::Length(1),
             Constraint::Length(12),
             Constraint::Length(13),
             Constraint::Length(38),
@@ -207,8 +248,9 @@ fn stream(frame: &mut Frame, area: Rect, state: &AppState) {
             Constraint::Length(20),
         ],
     )
+    .column_spacing(1)
     .header(
-        TRow::new(vec!["time", "kind", "fingerprint", "sni", "identity"])
+        TRow::new(vec!["", "time", "kind", "fingerprint", "sni", "identity"])
             .style(Style::default().fg(theme::BLUE_DIM)),
     );
     frame.render_widget(table, inner);
@@ -234,6 +276,13 @@ fn constellation(frame: &mut Frame, area: Rect, state: &AppState) {
         }
     }
 
+    // The point belonging to the row under the cursor, so the table and the
+    // scatter refer to each other rather than being two unrelated views.
+    let cursor = state
+        .current()
+        .and_then(|row| ja4_counts(&row.fingerprint))
+        .map(|(c, e)| (f64::from(c), f64::from(e)));
+
     let block = panel("constellation", false);
     let canvas = Canvas::default()
         .block(block)
@@ -241,6 +290,27 @@ fn constellation(frame: &mut Frame, area: Rect, state: &AppState) {
         .x_bounds([0.0, 36.0])
         .y_bounds([0.0, 36.0])
         .paint(move |ctx| {
+            // A faint lattice, so a bare point has something to be positioned
+            // against and the pane does not read as noise on black.
+            for step in (0..=36).step_by(6) {
+                let at = f64::from(step);
+                ctx.draw(&CanvasLine {
+                    x1: at,
+                    y1: 0.0,
+                    x2: at,
+                    y2: 36.0,
+                    color: theme::GRID,
+                });
+                ctx.draw(&CanvasLine {
+                    x1: 0.0,
+                    y1: at,
+                    x2: 36.0,
+                    y2: at,
+                    color: theme::GRID,
+                });
+            }
+            ctx.layer();
+
             ctx.draw(&Points {
                 coords: &fading,
                 color: theme::DIM,
@@ -257,6 +327,35 @@ fn constellation(frame: &mut Frame, area: Rect, state: &AppState) {
                 coords: &bad,
                 color: theme::ALERT,
             });
+            ctx.layer();
+
+            if let Some((cx, cy)) = cursor {
+                let ring: Vec<(f64, f64)> = (0..24)
+                    .map(|i| {
+                        let angle = f64::from(i) * std::f64::consts::TAU / 24.0;
+                        (
+                            2.2f64.mul_add(angle.cos(), cx),
+                            2.2f64.mul_add(angle.sin(), cy),
+                        )
+                    })
+                    .collect();
+                ctx.draw(&Points {
+                    coords: &ring,
+                    color: theme::PINK,
+                });
+            }
+            ctx.layer();
+
+            ctx.print(
+                0.6,
+                1.2,
+                Line::from(Span::styled("ciphers \u{2192}", theme::axis())),
+            );
+            ctx.print(
+                0.6,
+                34.0,
+                Line::from(Span::styled("\u{2191} exts", theme::axis())),
+            );
         });
     frame.render_widget(canvas, area);
 }
@@ -337,25 +436,34 @@ fn barcode(frame: &mut Frame, area: Rect, state: &AppState) {
     };
 
     let extensions = extensions_of(fields);
-    let bars: Vec<Span> = extensions
+
+    // Each well-known extension owns a fixed column, so two clients' barcodes
+    // line up and the difference between them is read positionally. A variable
+    // run of bars would only show how many, which the counts already say.
+    let mut slots: Vec<Span> = Vec::with_capacity(SLOTS.len());
+    for (id, _) in SLOTS {
+        if extensions.contains(id) {
+            slots.push(Span::styled("\u{2588}", Style::default().fg(theme::BLUE)));
+        } else {
+            slots.push(Span::styled("\u{00B7}", Style::default().fg(theme::GRID)));
+        }
+    }
+    let extra = extensions
         .iter()
-        .map(|ext| {
-            Span::styled(
-                "\u{2588}\u{2588} ",
-                Style::default().fg(if ext.starts_with("00") {
-                    theme::BLUE
-                } else {
-                    theme::PINK_DIM
-                }),
-            )
-        })
-        .collect();
+        .filter(|ext| !SLOTS.iter().any(|(id, _)| id == *ext))
+        .count();
+    if extra > 0 {
+        slots.push(Span::styled(
+            format!(" +{extra}"),
+            Style::default().fg(theme::PINK),
+        ));
+    }
 
     let text = vec![
-        Line::from(bars),
+        Line::from(slots),
         Line::from(Span::styled(
             format!(
-                "{} extensions  {} ciphers",
+                "{} ext  {} ciphers",
                 extensions.len(),
                 ciphers_of(fields).len()
             ),
@@ -364,6 +472,31 @@ fn barcode(frame: &mut Frame, area: Rect, state: &AppState) {
     ];
     frame.render_widget(Paragraph::new(text), inner);
 }
+
+/// The extension identifiers that get a fixed column in the barcode, in the
+/// order they are drawn. Anything outside this set is counted as an overflow
+/// rather than shifting every column along.
+const SLOTS: &[(&str, &str)] = &[
+    ("0000", "server_name"),
+    ("0005", "status_request"),
+    ("000a", "supported_groups"),
+    ("000b", "ec_point_formats"),
+    ("000d", "signature_algorithms"),
+    ("0010", "alpn"),
+    ("0012", "signed_certificate_timestamp"),
+    ("0015", "padding"),
+    ("0016", "encrypt_then_mac"),
+    ("0017", "extended_master_secret"),
+    ("001b", "compress_certificate"),
+    ("001c", "record_size_limit"),
+    ("0023", "session_ticket"),
+    ("002b", "supported_versions"),
+    ("002d", "psk_key_exchange_modes"),
+    ("0033", "key_share"),
+    ("4469", "application_settings"),
+    ("fe0d", "encrypted_client_hello"),
+    ("ff01", "renegotiation_info"),
+];
 
 /// Full-screen decode of the selected fingerprint.
 fn inspector(frame: &mut Frame, area: Rect, state: &AppState) {
