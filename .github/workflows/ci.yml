@@ -1,36 +1,37 @@
-# ©AngelaMos | 2026
 # ci.yml
 
 name: ci
 
 on:
   push:
-    paths:
-      - "PROJECTS/intermediate/ja3-ja4-tls-fingerprinting/**"
+    branches: [main]
   pull_request:
-    paths:
-      - "PROJECTS/intermediate/ja3-ja4-tls-fingerprinting/**"
+  workflow_dispatch:
 
-defaults:
-  run:
-    working-directory: PROJECTS/intermediate/ja3-ja4-tls-fingerprinting
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
 
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        rust: [stable, "1.85"]
+        rust: [stable, "1.85"]   # 1.85 is the MSRV in Cargo.toml
     steps:
       - uses: actions/checkout@v4
       - name: Install libpcap
         run: sudo apt-get update && sudo apt-get install -y libpcap-dev
       - name: Install Rust ${{ matrix.rust }}
-        run: rustup toolchain install ${{ matrix.rust }} --component clippy rustfmt --profile minimal
+        run: rustup toolchain install ${{ matrix.rust }} --profile minimal && rustup default ${{ matrix.rust }}
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.rust }}
       - name: Build
-        run: cargo +${{ matrix.rust }} build --workspace --all-targets
+        run: cargo build --workspace --all-targets
       - name: Test
-        run: cargo +${{ matrix.rust }} test --workspace
+        run: cargo test --workspace
 
   lint:
     runs-on: ubuntu-latest
@@ -39,8 +40,17 @@ jobs:
       - name: Install libpcap
         run: sudo apt-get update && sudo apt-get install -y libpcap-dev
       - name: Install Rust
-        run: rustup toolchain install stable --component clippy rustfmt --profile minimal
+        run: rustup toolchain install stable --component clippy,rustfmt --profile minimal && rustup default stable
+      - uses: Swatinem/rust-cache@v2
       - name: Format
         run: cargo fmt --all --check
       - name: Clippy
         run: cargo clippy --workspace --all-targets -- -D warnings
+
+  deny:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          command: check advisories bans licenses sources
