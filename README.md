@@ -90,6 +90,36 @@ One fingerprint line, a Chrome handshake to a Google host:
 > [!TIP]
 > [`just`](https://github.com/casey/just) is the command runner. Type `just` to list every recipe. `just bench` runs the throughput benchmarks; `just dev-up` brings up the dockerized dashboard with hot reload.
 
+## Dashboard
+
+```bash
+corvus tui --replay testdata/pcap/tls-handshake.pcapng --loop
+```
+
+```bash
+corvus tui --live eth0
+```
+
+A full-screen terminal dashboard. Intelligence matching and detection are on by default; `--no-intel` and `--no-detect` strip it back.
+
+| Pane | What it shows |
+|---|---|
+| **live** | Every handshake as it lands, coloured by verdict. `↑↓`/`jk` to select |
+| **constellation** | Braille scatter, cipher count against extension count, both read out of JA4's readable prefix. Points bloom on arrival and decay over twelve seconds, so a browser population forms a tight cluster and an odd client sits alone in empty space |
+| **divergence** | Distinct JA3 hashes against distinct JA4 hashes over time. With a browser on the wire the JA3 line climbs without bound while JA4 stays flat — the argument for JA4, drawing itself |
+| **extensions** | The selected client's extension set as a bitmap. Stack two and the difference is the fingerprint |
+| **alerts** | Detection hits, severity-coloured |
+
+`enter` opens the inspector: the full JA4 and JA3, SNI, ALPN, User-Agent, the intel verdict, and the sorted cipher and extension lists that were actually hashed. `space` pauses, `q` quits.
+
+The dashboard is behind the **`tui` feature, on by default**. To build without ratatui:
+
+```bash
+cargo build --release --no-default-features
+```
+
+`pcap`, `live`, `serve`, and `intel` are unaffected — only the `tui` subcommand disappears.
+
 ## Roadmap
 
 Everything below is **planned, not built**. A sensor is half a loop — observe a fingerprint, reproduce it, then attack your own detector and see what still catches you.
@@ -154,7 +184,7 @@ Three crates in a strict dependency line. The engine knows nothing about databas
 
 ```bash
 cargo build --release            # → target/release/corvus
-cargo test --workspace           # 204 unit + integration tests, 1 ignored
+cargo test --workspace           # 211 unit + integration tests, 1 ignored
 cargo bench -p corvus-core       # criterion throughput benchmarks
 just clippy                      # clippy::pedantic, warnings as errors
 just fmt-check                   # rustfmt

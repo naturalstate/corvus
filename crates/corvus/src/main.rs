@@ -5,6 +5,8 @@ mod cli;
 mod live;
 mod report;
 mod serve;
+#[cfg(feature = "tui")]
+mod tui;
 
 use anyhow::Result;
 use clap::Parser;

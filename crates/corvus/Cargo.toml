@@ -41,3 +41,13 @@ etherparse.workspace = true
 smallvec.workspace = true
 thiserror.workspace = true
 rustix.workspace = true
+# crossterm is not a direct dependency: ratatui re-exports the exact version it
+# was built against, and depending on it separately pulls in a second,
+# incompatible copy.
+ratatui = { workspace = true, optional = true }
+
+[features]
+default = ["tui"]
+# The full-screen terminal dashboard. Building with --no-default-features drops
+# ratatui entirely; pcap, live, serve, and intel are unaffected.
+tui = ["dep:ratatui"]

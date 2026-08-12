@@ -183,6 +183,51 @@ pub enum Command {
         no_promisc: bool,
     },
 
+    /// Full-screen terminal dashboard.
+    ///
+    /// Renders the live stream, a cipher-against-extension constellation, the
+    /// JA3/JA4 divergence chart, and the alert feed in one screen. Intelligence
+    /// matching and detection are on by default here; pass --no-intel or
+    /// --no-detect to run it bare.
+    ///
+    /// Available only when built with the `tui` feature, which is on by
+    /// default. `cargo build --no-default-features` drops it and ratatui with
+    /// it, leaving pcap, live, serve, and intel unchanged.
+    #[cfg(feature = "tui")]
+    Tui {
+        /// Replay this capture file as the feed.
+        #[arg(long, value_name = "PCAP")]
+        replay: Option<PathBuf>,
+
+        /// Loop the replayed capture instead of stopping at its end.
+        #[arg(long = "loop")]
+        repeat: bool,
+
+        /// Pause between replayed events, in milliseconds.
+        #[arg(long, default_value_t = 120)]
+        interval_ms: u64,
+
+        /// Capture live from this interface instead of replaying a file.
+        #[arg(long, value_name = "IFACE")]
+        live: Option<String>,
+
+        /// BPF filter compiled into the kernel for live capture.
+        #[arg(long)]
+        filter: Option<String>,
+
+        /// Do not match fingerprints against the intelligence database.
+        #[arg(long)]
+        no_intel: bool,
+
+        /// Do not run the detection rules.
+        #[arg(long)]
+        no_detect: bool,
+
+        /// Path to the intelligence database, defaulting to the data directory.
+        #[arg(long)]
+        db: Option<PathBuf>,
+    },
+
     /// Manage the local threat intelligence database.
     Intel {
         #[command(subcommand)]
@@ -317,6 +362,35 @@ impl Cli {
                 filter,
                 no_promisc,
             ),
+            #[cfg(feature = "tui")]
+            Command::Tui {
+                replay,
+                repeat,
+                interval_ms,
+                live,
+                filter,
+                no_intel,
+                no_detect,
+                db,
+            } => {
+                let source = match (replay, live) {
+                    (_, Some(interface)) => crate::tui::Source::Live { interface, filter },
+                    (Some(path), None) => crate::tui::Source::Replay {
+                        path,
+                        interval: Duration::from_millis(interval_ms),
+                        looping: repeat,
+                    },
+                    (None, None) => anyhow::bail!(
+                        "the dashboard needs a feed: pass --replay <PCAP> or --live <IFACE>"
+                    ),
+                };
+                crate::tui::run(crate::tui::TuiConfig {
+                    source,
+                    intel: !no_intel,
+                    detect: !no_detect,
+                    db,
+                })
+            }
             Command::Intel { action } => action.run(),
         }
     }
@@ -684,7 +758,7 @@ struct EnrichedEvent<'a> {
 /// Looks every fingerprint in an event up against the store, returning the
 /// reports that found intelligence. A lookup error degrades to no enrichment
 /// with a warning rather than ending the capture.
-fn enrich(store: Option<&IntelStore>, event: &FingerprintEvent) -> Vec<MatchReport> {
+pub(crate) fn enrich(store: Option<&IntelStore>, event: &FingerprintEvent) -> Vec<MatchReport> {
     let Some(store) = store else {
         return Vec::new();
     };
@@ -700,7 +774,7 @@ fn enrich(store: Option<&IntelStore>, event: &FingerprintEvent) -> Vec<MatchRepo
 /// Runs the detection rules for one event when detection is enabled, recording
 /// the observation and any alerts. A per-event failure degrades to a warning so
 /// one bad record cannot end the capture.
-fn detect_event(
+pub(crate) fn detect_event(
     store: Option<&mut IntelStore>,
     detect: bool,
     event: &FingerprintEvent,
@@ -793,7 +867,11 @@ fn write_intel_lines(
 /// without annotation rather than failing. Detection needs somewhere to record
 /// observations, so it creates the database, warning that known-bad matching
 /// stays dark until the feeds are seeded.
-fn open_for_run(intel: bool, detect: bool, db: Option<&Path>) -> Result<Option<IntelStore>> {
+pub(crate) fn open_for_run(
+    intel: bool,
+    detect: bool,
+    db: Option<&Path>,
+) -> Result<Option<IntelStore>> {
     if !intel && !detect {
         return Ok(None);
     }
