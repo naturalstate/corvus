@@ -14,9 +14,9 @@ set -euo pipefail
 # ============================================================================
 # Config
 # ============================================================================
-REPO_OWNER="CarterPerez-dev"
-REPO_NAME="Cybersecurity-Projects"
-SUBDIR="PROJECTS/intermediate/ja3-ja4-tls-fingerprinting"
+REPO_OWNER="naturalstate"
+REPO_NAME="corvus"
+SUBDIR="."
 BINARY="corvus"
 CRATE="crates/corvus"
 REPO_URL="https://github.com/${REPO_OWNER}/${REPO_NAME}.git"
