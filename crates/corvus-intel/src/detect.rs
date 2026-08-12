@@ -30,9 +30,9 @@
 //! second of the pair completes the picture, not two.
 
 use anyhow::Result;
+use corvus_core::{FingerprintEvent, StreamEvent};
 use rusqlite::{Connection, params};
 use serde::Serialize;
-use corvus_core::{FingerprintEvent, StreamEvent};
 
 use crate::matcher::{event_fingerprints, match_one};
 use crate::model::{Category, FpKind, MatchReport, Severity, Verdict};

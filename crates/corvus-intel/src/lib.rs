@@ -26,9 +26,9 @@ use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use anyhow::{Context, Result};
+use corvus_core::FingerprintEvent;
 use rusqlite::{Connection, params};
 use serde::Serialize;
-use corvus_core::FingerprintEvent;
 
 pub use detect::{Alert, AlertSeverity, DetectConfig, Rule};
 pub use import::ImportSummary;

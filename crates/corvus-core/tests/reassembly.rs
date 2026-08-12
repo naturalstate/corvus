@@ -12,8 +12,8 @@
 //! passive sensor that can be crashed by a crafted segment is a denial of
 //! service waiting to happen.
 
-use proptest::prelude::*;
 use corvus_core::pipeline::flow::{PushOutcome, ReassemblyLimits, StreamReassembler};
+use proptest::prelude::*;
 
 fn generous_limits() -> ReassemblyLimits {
     ReassemblyLimits {

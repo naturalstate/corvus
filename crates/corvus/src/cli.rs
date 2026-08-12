@@ -20,13 +20,22 @@ use corvus_intel::{Alert, FpKind, IntelStore, MatchReport, MatchStrength, defaul
 /// zero or negative count is raised to.
 const DEFAULT_ALERT_LIMIT: i64 = 50;
 
+/// Printed above the help text.
+const BANNER: &str = r"
+ ▄▄·       ▄▄▄   ▌ ▐·▄• ▄▌.▄▄ ·
+▐█ ▌▪▪     ▀▄ █·▪█·█▌█▪██▌▐█ ▀.
+██ ▄▄ ▄█▀▄ ▐▀▀▄ ▐█▐█•█▌▐█▌▄▀▀▀█▄
+▐███▌▐█▌.▐▌▐█•█▌ ███ ▐█▄█▌▐█▄▪▐█
+·▀▀▀  ▀█▄▀▪.▀  ▀. ▀   ▀▀▀  ▀▀▀▀
+";
+
 /// JA3/JA4 TLS fingerprinting tool.
 ///
 /// Fingerprints TLS clients and servers from live capture or packet captures,
 /// matches them against a local intelligence database, and flags anomalies such
 /// as a fingerprint that disagrees with its own User-Agent.
 #[derive(Debug, Parser)]
-#[command(name = "corvus", version, about, long_about = None)]
+#[command(name = "corvus", version, about, long_about = None, before_help = BANNER)]
 pub struct Cli {
     /// Increase log verbosity (repeat for more detail).
     #[arg(short, long, global = true, action = clap::ArgAction::Count)]

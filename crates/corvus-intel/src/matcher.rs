@@ -12,8 +12,8 @@
 //! match misses. The three tiers query disjoint rows, so a hit is counted once
 //! at its true strength with no later de duplication.
 
-use rusqlite::{Connection, Params, Row, params};
 use corvus_core::{FingerprintEvent, StreamEvent};
+use rusqlite::{Connection, Params, Row, params};
 
 use super::ja4_parts;
 use super::model::{CatalogEntry, Category, FpKind, IntelHit, MatchReport, MatchStrength};

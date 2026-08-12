@@ -4,11 +4,11 @@
 mod common;
 
 use common::ClientHelloBuilder;
-use proptest::prelude::*;
 use corvus_core::parse::{
     first_handshake_message, handshake_bytes, parse_client_hello, parse_server_hello,
 };
 use corvus_core::registry::handshake_type;
+use proptest::prelude::*;
 
 fn sample() -> ClientHelloBuilder {
     ClientHelloBuilder::new()
