@@ -18,6 +18,14 @@
 >
 > Observe, reproduce, then break your own detector.
 
+<p align="center">
+  <img src="assets/cli-ui.png" alt="The corvus terminal dashboard: live handshake stream, cipher-against-extension constellation, JA3/JA4 divergence chart, extension barcode, and alert feed" width="100%">
+</p>
+
+<p align="center">
+  <sub><code>corvus tui --replay testdata/pcap/tls-handshake.pcapng --loop</code></sub>
+</p>
+
 ## How it works
 
 A ClientHello is sent in the clear, before encryption is negotiated. It enumerates the client's TLS versions, cipher suites, extensions, and elliptic curves, and every TLS stack assembles that list differently. Hash the list and you get a stable identifier for the *software* — one that survives a change of IP, domain, and certificate.
