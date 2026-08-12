@@ -20,14 +20,18 @@ use corvus_intel::{Alert, FpKind, IntelStore, MatchReport, MatchStrength, defaul
 /// zero or negative count is raised to.
 const DEFAULT_ALERT_LIMIT: i64 = 50;
 
-/// Printed above the help text.
-const BANNER: &str = r"
+/// Printed above the help text, in light blue. The escapes are stripped
+/// automatically when help is not going to a terminal.
+const BANNER: &str = concat!(
+    "\u{1b}[38;5;117m",
+    r"
  ▄▄·       ▄▄▄   ▌ ▐·▄• ▄▌.▄▄ ·
 ▐█ ▌▪▪     ▀▄ █·▪█·█▌█▪██▌▐█ ▀.
 ██ ▄▄ ▄█▀▄ ▐▀▀▄ ▐█▐█•█▌▐█▌▄▀▀▀█▄
 ▐███▌▐█▌.▐▌▐█•█▌ ███ ▐█▄█▌▐█▄▪▐█
-·▀▀▀  ▀█▄▀▪.▀  ▀. ▀   ▀▀▀  ▀▀▀▀
-";
+·▀▀▀  ▀█▄▀▪.▀  ▀. ▀   ▀▀▀  ▀▀▀▀",
+    "\u{1b}[0m",
+);
 
 /// JA3/JA4 TLS fingerprinting tool.
 ///

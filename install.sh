@@ -34,8 +34,9 @@ DO_LIVE=0
 if [ -t 2 ] && [ -z "${NO_COLOR:-}" ]; then
     BOLD=$'\033[1m'; DIM=$'\033[2m'; RED=$'\033[31m'; GREEN=$'\033[32m'
     YELLOW=$'\033[33m'; CYAN=$'\033[36m'; RESET=$'\033[0m'
+    LBLUE=$'\033[38;5;117m'
 else
-    BOLD=""; DIM=""; RED=""; GREEN=""; YELLOW=""; CYAN=""; RESET=""
+    BOLD=""; DIM=""; RED=""; GREEN=""; YELLOW=""; CYAN=""; RESET=""; LBLUE=""
 fi
 
 info() { printf '%s\n' "  ${CYAN}+${RESET} $*" >&2; }
@@ -51,7 +52,7 @@ cleanup() { [ -n "$TMP_DIR" ] && rm -rf "$TMP_DIR"; return 0; }
 trap cleanup EXIT
 
 banner() {
-    printf '%s' "${CYAN}${BOLD}" >&2
+    printf '%s' "${LBLUE}${BOLD}" >&2
     cat >&2 <<'ART'
 
  ▄▄·       ▄▄▄   ▌ ▐·▄• ▄▌.▄▄ ·
