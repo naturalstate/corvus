@@ -422,6 +422,66 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cc14f565cf027a105f7a44ccf9e5b424348421a1d8952a8fc9d499d313107789"
 
 [[package]]
+name = "corvus"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "axum",
+ "clap",
+ "corvus-core",
+ "corvus-intel",
+ "csv",
+ "etherparse",
+ "flume",
+ "pcap",
+ "pcap-parser",
+ "rustix",
+ "serde",
+ "serde_json",
+ "smallvec",
+ "thiserror",
+ "tokio",
+ "tokio-stream",
+ "tower",
+ "tower-http",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "corvus-core"
+version = "0.1.0"
+dependencies = [
+ "aes",
+ "aes-gcm",
+ "criterion",
+ "etherparse",
+ "hex",
+ "hkdf",
+ "md-5",
+ "pcap-parser",
+ "proptest",
+ "serde",
+ "serde_json",
+ "sha2",
+ "smallvec",
+ "thiserror",
+]
+
+[[package]]
+name = "corvus-intel"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "corvus-core",
+ "csv",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "tempfile",
+]
+
+[[package]]
 name = "cpufeatures"
 version = "0.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1683,66 +1743,6 @@ checksum = "be4d6b5f19ff7664e8c98d03e2139cb510db9b0a60b55f8e8709b689d939b6bc"
 dependencies = [
  "serde",
  "serde_json",
-]
-
-[[package]]
-name = "tlsfp"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "axum",
- "clap",
- "csv",
- "etherparse",
- "flume",
- "pcap",
- "pcap-parser",
- "rustix",
- "serde",
- "serde_json",
- "smallvec",
- "thiserror",
- "tlsfp-core",
- "tlsfp-intel",
- "tokio",
- "tokio-stream",
- "tower",
- "tower-http",
- "tracing",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "tlsfp-core"
-version = "0.1.0"
-dependencies = [
- "aes",
- "aes-gcm",
- "criterion",
- "etherparse",
- "hex",
- "hkdf",
- "md-5",
- "pcap-parser",
- "proptest",
- "serde",
- "serde_json",
- "sha2",
- "smallvec",
- "thiserror",
-]
-
-[[package]]
-name = "tlsfp-intel"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "csv",
- "rusqlite",
- "serde",
- "serde_json",
- "tempfile",
- "tlsfp-core",
 ]
 
 [[package]]

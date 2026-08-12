@@ -25,8 +25,8 @@ server {
     # Server-Sent Events: never buffer the live stream or it stalls in nginx.
     location /api/stream {
         resolver 127.0.0.11 ipv6=off valid=10s;
-        set $tlsfp_upstream tlsfp;
-        proxy_pass http://$tlsfp_upstream:8080;
+        set $corvus_upstream corvus;
+        proxy_pass http://$corvus_upstream:8080;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -42,8 +42,8 @@ server {
 
     location /api/ {
         resolver 127.0.0.11 ipv6=off valid=10s;
-        set $tlsfp_upstream tlsfp;
-        proxy_pass http://$tlsfp_upstream:8080;
+        set $corvus_upstream corvus;
+        proxy_pass http://$corvus_upstream:8080;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;

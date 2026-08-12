@@ -9,7 +9,7 @@
 services:
   cloudflared:
     image: cloudflare/cloudflared:latest
-    container_name: ${APP_NAME:-tlsfp}-tunnel
+    container_name: ${APP_NAME:-corvus}-tunnel
     command: tunnel run --token ${CLOUDFLARE_TUNNEL_TOKEN}
     networks:
       - app

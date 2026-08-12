@@ -6,11 +6,10 @@ applies to what.
 
 ## Upstream
 
-Corvus is a fork of `tlsfp` by Carter Perez, from the Cybersecurity-Projects
-collection at `https://github.com/CarterPerez-dev/Cybersecurity-Projects`
-(`PROJECTS/intermediate/ja3-ja4-tls-fingerprinting`). All code under `crates/`
-originates there and remains their copyright. Corvus is a derivative work
-distributed under the same license.
+Corvus is a modified derivative of an earlier TLS fingerprinting sensor by
+Carter Perez (<https://github.com/CarterPerez-dev>). Code under `crates/`
+originates there and remains their copyright. Modified 2026, and distributed
+under the same license.
 
 ## The code
 

@@ -2,7 +2,7 @@
 # ©AngelaMos | 2026
 # install.sh
 #
-# One-shot installer for tlsfp. Goes from a fresh machine to `tlsfp` on your
+# One-shot installer for corvus. Goes from a fresh machine to `corvus` on your
 # PATH with the intelligence database seeded. Run it from a clone:
 #
 #   ./install.sh
@@ -17,15 +17,15 @@ set -euo pipefail
 REPO_OWNER="CarterPerez-dev"
 REPO_NAME="Cybersecurity-Projects"
 SUBDIR="PROJECTS/intermediate/ja3-ja4-tls-fingerprinting"
-BINARY="tlsfp"
-CRATE="crates/tlsfp"
+BINARY="corvus"
+CRATE="crates/corvus"
 REPO_URL="https://github.com/${REPO_OWNER}/${REPO_NAME}.git"
 DEFAULT_BRANCH="main"
 
 JA4DB_URL="${JA4DB_URL:-https://ja4db.com/api/read/}"
 JA4DB_TIMEOUT="${JA4DB_TIMEOUT:-180}"
 
-PREFIX="${TLSFP_PREFIX:-}"      # cargo install --root; empty = cargo's default (~/.cargo/bin)
+PREFIX="${CORVUS_PREFIX:-}"      # cargo install --root; empty = cargo's default (~/.cargo/bin)
 DO_LIVE=0
 
 # ============================================================================
@@ -54,12 +54,10 @@ banner() {
     printf '%s' "${CYAN}${BOLD}" >&2
     cat >&2 <<'ART'
 
-   _   _      __
-  | |_| |___ / _|_ __
-  | __| / __| |_| '_ \
-  | |_| \__ \  _| |_) |
-   \__|_|___/_| | .__/
-                |_|
+   ___ ___  _____   ___   _ ___
+  / __/ _ \| _ \ \ / / | | / __|
+ | (_| (_) |   /\ V /| |_| \__ \
+  \___\___/|_|_\ \_/  \__,_|___/
 ART
     printf '%s\n' "${RESET}" >&2
     printf '%s\n' "  ${DIM}JA3/JA4 TLS fingerprinting, intel matching, anomaly detection${RESET}" >&2
@@ -95,7 +93,7 @@ download() {   # download URL DEST
 # ============================================================================
 usage() {
     cat >&2 <<USAGE
-install.sh — install tlsfp
+install.sh — install corvus
 
   ./install.sh [options]
 
@@ -138,16 +136,16 @@ esac
 # Bootstrap: locate the project, cloning the monorepo if piped from the web
 # ============================================================================
 resolve_project() {
-    if [ -f "./Cargo.toml" ] && [ -d "./crates/tlsfp" ]; then
+    if [ -f "./Cargo.toml" ] && [ -d "./crates/corvus" ]; then
         pwd; return
     fi
     local self="${BASH_SOURCE[0]:-}"
-    if [ -n "$self" ] && [ -f "$(dirname "$self")/Cargo.toml" ] && [ -d "$(dirname "$self")/crates/tlsfp" ]; then
+    if [ -n "$self" ] && [ -f "$(dirname "$self")/Cargo.toml" ] && [ -d "$(dirname "$self")/crates/corvus" ]; then
         (cd "$(dirname "$self")" && pwd); return
     fi
     have git || { warn "git not found — installing it"; pkg_install git || die "could not install git; install it then re-run"; }
-    have git || die "git is required to bootstrap tlsfp"
-    local cache="${XDG_CACHE_HOME:-$HOME/.cache}/tlsfp-src"
+    have git || die "git is required to bootstrap corvus"
+    local cache="${XDG_CACHE_HOME:-$HOME/.cache}/corvus-src"
     if [ -d "$cache/.git" ]; then
         info "updating cached clone at $cache"
         git -C "$cache" pull --ff-only --quiet 2>/dev/null || warn "pull failed; using existing clone"
@@ -211,7 +209,7 @@ ensure_build_deps() {
 # ============================================================================
 CARGO_BIN_DIR="${CARGO_HOME:-$HOME/.cargo}/bin"
 install_binary() {
-    header "Building and installing tlsfp"
+    header "Building and installing corvus"
     if [ -n "$PREFIX" ]; then
         cargo install --path "$CRATE" --root "$PREFIX" --force >&2
         CARGO_BIN_DIR="$PREFIX/bin"
@@ -228,7 +226,7 @@ wire_path() {
     case "$shell" in
         zsh)  rc="$HOME/.zshrc" ;;
         fish) mkdir -p "$HOME/.config/fish/conf.d"
-              echo "fish_add_path $CARGO_BIN_DIR" > "$HOME/.config/fish/conf.d/tlsfp.fish"
+              echo "fish_add_path $CARGO_BIN_DIR" > "$HOME/.config/fish/conf.d/corvus.fish"
               ok "added $CARGO_BIN_DIR to PATH (fish)" ;;
         bash) rc="$HOME/.bashrc"; [ -f "$rc" ] || rc="$HOME/.bash_profile" ;;
         *)    rc="$HOME/.profile" ;;
@@ -312,7 +310,7 @@ else
     warn "open a new terminal, or: export PATH=\"$CARGO_BIN_DIR:\$PATH\""
 fi
 
-printf '\n%s\n\n' "  ${GREEN}${BOLD}tlsfp is ready.${RESET}" >&2
+printf '\n%s\n\n' "  ${GREEN}${BOLD}corvus is ready.${RESET}" >&2
 cat >&2 <<FOOTER
   ${DIM}fingerprint a capture:${RESET}   ${CYAN}${BINARY} pcap --intel capture.pcap${RESET}
   ${DIM}fingerprint live:${RESET}        ${CYAN}${BINARY} live --intel any${RESET}
@@ -322,7 +320,7 @@ cat >&2 <<FOOTER
 FOOTER
 if [ "$DO_LIVE" -eq 0 ]; then
     printf '%s\n' "  ${DIM}live capture needs caps (then NO sudo):${RESET}  re-run ${CYAN}install.sh --live${RESET}" >&2
-    printf '%s\n' "  ${DIM}or grant now:${RESET}  ${CYAN}sudo setcap cap_net_raw,cap_net_admin=eip \"\$(command -v tlsfp)\"${RESET}" >&2
+    printf '%s\n' "  ${DIM}or grant now:${RESET}  ${CYAN}sudo setcap cap_net_raw,cap_net_admin=eip \"\$(command -v corvus)\"${RESET}" >&2
 fi
 have just && [ -f "$PROJECT/justfile" ] && printf '%s\n' "  ${DIM}dev commands:${RESET}            ${CYAN}just${RESET}" >&2
 printf '%s\n' "  ${DIM}docs: https://github.com/${REPO_OWNER}/${REPO_NAME}${RESET}" >&2

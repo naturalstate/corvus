@@ -3,7 +3,7 @@
 
 [workspace]
 resolver = "3"
-members = ["crates/tlsfp-core", "crates/tlsfp-intel", "crates/tlsfp"]
+members = ["crates/corvus-core", "crates/corvus-intel", "crates/corvus"]
 
 [workspace.package]
 version = "0.1.0"
@@ -14,8 +14,8 @@ authors = ["Carter Perez", "naturalstate"]
 repository = "https://github.com/naturalstate/corvus"
 
 [workspace.dependencies]
-tlsfp-core = { path = "crates/tlsfp-core" }
-tlsfp-intel = { path = "crates/tlsfp-intel" }
+corvus-core = { path = "crates/corvus-core" }
+corvus-intel = { path = "crates/corvus-intel" }
 
 winnow = "0.7"
 md-5 = "0.10"

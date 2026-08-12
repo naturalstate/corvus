@@ -3,19 +3,19 @@
 # dev.compose.yml
 # =============================================================================
 # Development compose: nginx fronts the Vite dev server (HMR) and proxies /api
-# to the tlsfp backend. The backend lives under the `backend` profile and is
+# to the corvus backend. The backend lives under the `backend` profile and is
 # not started by default until the serve command is implemented.
 #   docker compose -f dev.compose.yml up
 #   docker compose -f dev.compose.yml --profile backend up
 # Uses .env.development
 # =============================================================================
 
-name: ${APP_NAME:-tlsfp}-dev
+name: ${APP_NAME:-corvus}-dev
 
 services:
   nginx:
     image: nginx:1.27-alpine
-    container_name: ${APP_NAME:-tlsfp}-nginx-dev
+    container_name: ${APP_NAME:-corvus}-nginx-dev
     ports:
       - "${NGINX_HOST_PORT:-48418}:80"
     volumes:
@@ -32,7 +32,7 @@ services:
     build:
       context: ./frontend
       dockerfile: ../infra/docker/vite.dev
-    container_name: ${APP_NAME:-tlsfp}-frontend-dev
+    container_name: ${APP_NAME:-corvus}-frontend-dev
     command: sh -c "pnpm install && exec pnpm dev --host 0.0.0.0"
     ports:
       - "${FRONTEND_HOST_PORT:-46494}:5173"
@@ -42,30 +42,30 @@ services:
     environment:
       - CI=true
       - VITE_API_URL=${VITE_API_URL:-/api}
-      - VITE_API_TARGET=${VITE_API_TARGET:-http://tlsfp:8080}
+      - VITE_API_TARGET=${VITE_API_TARGET:-http://corvus:8080}
       - VITE_APP_TITLE=${VITE_APP_TITLE:-JA3/JA4 TLS Fingerprinting (Dev)}
     networks:
       - app
     restart: unless-stopped
 
-  tlsfp:
+  corvus:
     build:
       context: .
-      dockerfile: infra/docker/tlsfp.dev
-    container_name: ${APP_NAME:-tlsfp}-backend-dev
+      dockerfile: infra/docker/corvus.dev
+    container_name: ${APP_NAME:-corvus}-backend-dev
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
-        cargo run --bin tlsfp -- intel seed --db /data/intel.db || true
-        exec cargo watch -x 'run --bin tlsfp -- serve 0.0.0.0:8080 --db /data/intel.db --replay /workspace/testdata/pcap/tls-alpn-h2.pcap --loop'
+        cargo run --bin corvus -- intel seed --db /data/intel.db || true
+        exec cargo watch -x 'run --bin corvus -- serve 0.0.0.0:8080 --db /data/intel.db --replay /workspace/testdata/pcap/tls-alpn-h2.pcap --loop'
     profiles:
       - backend
     environment:
-      - RUST_LOG=${RUST_LOG:-tlsfp=debug}
+      - RUST_LOG=${RUST_LOG:-corvus=debug}
     volumes:
       - .:/workspace
-      - tlsfp_target:/workspace/target
-      - tlsfp_data:/data
+      - corvus_target:/workspace/target
+      - corvus_data:/data
     networks:
       - app
     restart: unless-stopped
@@ -76,5 +76,5 @@ networks:
 
 volumes:
   frontend_modules:
-  tlsfp_target:
-  tlsfp_data:
+  corvus_target:
+  corvus_data:

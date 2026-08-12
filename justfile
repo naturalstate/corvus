@@ -49,11 +49,11 @@ tsc *ARGS:
 
 [group('backend')]
 build-backend:
-    cargo build --release --bin tlsfp
+    cargo build --release --bin corvus
 
 [group('backend')]
 run-backend *ARGS:
-    cargo run --bin tlsfp -- {{ARGS}}
+    cargo run --bin corvus -- {{ARGS}}
 
 [group('backend')]
 test-backend:

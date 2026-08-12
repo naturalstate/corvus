@@ -13,19 +13,19 @@ These build familiarity with the pipeline without touching the cryptography.
 
 The CLI's `intel lookup` accepts a fixed set of fingerprint kinds. Trace `FpKind::from_token` in `model.rs` and the error message in `cli.rs`, and make sure every kind the engine emits is accepted (and that the help text lists them).
 
-*Prove it:* run `tlsfp intel lookup ja4t 64240_2-1-3-1-1-4_1460_8` and get a verdict instead of an "unknown kind" error.
+*Prove it:* run `corvus intel lookup ja4t 64240_2-1-3-1-1-4_1460_8` and get a verdict instead of an "unknown kind" error.
 
 ### 2. A new readable output column
 
 The streaming output prints the JA4 and JA3 per line. Add the SNI's registered domain (the eTLD+1) as a column, or a one-character flag when the fingerprint had an intelligence hit. The formatting lives in `write_event` in `cli.rs`.
 
-*Prove it:* run `tlsfp pcap testdata/pcap/tls-handshake.pcapng` and read the new column.
+*Prove it:* run `corvus pcap testdata/pcap/tls-handshake.pcapng` and read the new column.
 
 ### 3. Seed a fourth feed
 
 `seed.rs` compiles three CSV feeds into the binary. Add a fourth (find a public JA4 or JA3 feed, record its license in `NOTICE.md` and the `intel_source` table). Follow the existing `load_*` functions and the `NewFingerprint` shape.
 
-*Prove it:* `tlsfp intel seed` then `tlsfp intel stats` shows the new feed and its row count.
+*Prove it:* `corvus intel seed` then `corvus intel stats` shows the new feed and its row count.
 
 ## Intermediate
 
@@ -61,7 +61,7 @@ These reach into the cryptography or the architecture.
 
 ### 8. Active fingerprint scanning (a separate tool)
 
-This sensor is strictly passive. Build a *separate* binary (a new crate, so the passive guarantee in `tlsfp-core` is never violated) that actively connects to a host, completes a handshake, and fingerprints the *server's* JA4S, the way `tlsd`-style scanners do. This is a different threat model (you are now sending packets and are detectable), so it must be a clearly separate tool.
+This sensor is strictly passive. Build a *separate* binary (a new crate, so the passive guarantee in `corvus-core` is never violated) that actively connects to a host, completes a handshake, and fingerprints the *server's* JA4S, the way `tlsd`-style scanners do. This is a different threat model (you are now sending packets and are detectable), so it must be a clearly separate tool.
 
 *Prove it:* fingerprint a known server (for example a Cloudflare host) and confirm its JA4S is stable across runs.
 

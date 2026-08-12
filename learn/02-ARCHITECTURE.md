@@ -11,31 +11,31 @@ The project is one Cargo workspace with three crates in a strict dependency line
 
 ```
    ┌──────────────────────────────────────────────────────────┐
-   │  tlsfp-core     the engine                                │
+   │  corvus-core     the engine                                │
    │  parses TLS, reassembles TCP, decrypts QUIC, hashes.      │
    │  Depends on NOTHING that touches a network, a database,   │
    │  or an async runtime. Forbids `unsafe`. Fuzzable.         │
    └───────────────────────────┬──────────────────────────────┘
-                               │  tlsfp-core::FingerprintEvent
+                               │  corvus-core::FingerprintEvent
    ┌───────────────────────────┴──────────────────────────────┐
-   │  tlsfp-intel    the judgement                             │
+   │  corvus-intel    the judgement                             │
    │  owns a bundled SQLite database. Matches a fingerprint    │
    │  to a verdict, runs the detection rules, records alerts.  │
-   │  Synchronous on purpose. Depends only on tlsfp-core.      │
+   │  Synchronous on purpose. Depends only on corvus-core.      │
    └───────────────────────────┬──────────────────────────────┘
                                │  MatchReport + Alert
    ┌───────────────────────────┴──────────────────────────────┐
-   │  tlsfp          the binary                                │
+   │  corvus          the binary                                │
    │  the clap CLI and the axum web dashboard. Wires a packet  │
    │  source to the engine to the store to a writer.           │
    └──────────────────────────────────────────────────────────┘
 ```
 
-The reason for the split is testability and blast radius. `tlsfp-core` has no I/O, so the entire fingerprinting engine runs byte-exact in unit tests against vendored captures, with no network, no clock, and no database to mock. It can be fuzzed in isolation, which matters because it parses hostile input. `tlsfp-intel` adds exactly one concern, persistence and judgement, and depends only on the engine's output type. The binary is the only crate that knows about interfaces, runtimes, and the terminal. A bug in the dashboard cannot reach the parser; a parser change cannot break the database schema.
+The reason for the split is testability and blast radius. `corvus-core` has no I/O, so the entire fingerprinting engine runs byte-exact in unit tests against vendored captures, with no network, no clock, and no database to mock. It can be fuzzed in isolation, which matters because it parses hostile input. `corvus-intel` adds exactly one concern, persistence and judgement, and depends only on the engine's output type. The binary is the only crate that knows about interfaces, runtimes, and the terminal. A bug in the dashboard cannot reach the parser; a parser change cannot break the database schema.
 
 ## The capture pipeline
 
-Inside `tlsfp-core`, a raw frame becomes a fingerprint by flowing through a fixed sequence of stages. Each stage is a separate module so it can be understood and tested alone.
+Inside `corvus-core`, a raw frame becomes a fingerprint by flowing through a fixed sequence of stages. Each stage is a separate module so it can be understood and tested alone.
 
 ```
   PacketSource          decode             flow reassembly        protocol            fingerprint
@@ -77,7 +77,7 @@ The QUIC path (`quic.rs`) is a parallel entry into the same fingerprint code. A 
 
 ## The intelligence store
 
-`tlsfp-intel` turns a `FingerprintEvent` into a judgement. It owns an embedded SQLite database, which is the right choice here: zero configuration, a single file, transactional, and able to support a dashboard reading while a sensor writes (it opens in WAL mode with a busy timeout for exactly that). The store is **synchronous**, deliberately. A lookup is one indexed query and a capture is a plain loop; wrapping that in an async runtime would add complexity and buy nothing. The async runtime lives only in the web server, where concurrent readers genuinely exist.
+`corvus-intel` turns a `FingerprintEvent` into a judgement. It owns an embedded SQLite database, which is the right choice here: zero configuration, a single file, transactional, and able to support a dashboard reading while a sensor writes (it opens in WAL mode with a busy timeout for exactly that). The store is **synchronous**, deliberately. A lookup is one indexed query and a capture is a plain loop; wrapping that in an async runtime would add complexity and buy nothing. The async runtime lives only in the web server, where concurrent readers genuinely exist.
 
 ```
    FingerprintEvent
@@ -120,15 +120,15 @@ The correlation rules (`ua_mismatch`, `os_mismatch`) are the ones that catch eva
 
 ## The binary: CLI and dashboard
 
-`tlsfp` is the only crate that touches the outside world.
+`corvus` is the only crate that touches the outside world.
 
 - **`cli.rs`** is the clap command tree: `pcap`, `live`, `serve`, and the `intel` subcommands. It owns the streaming output, the JSON serialization, and the wiring of a source to the engine to the store.
 - **`live.rs`** runs libpcap on a dedicated OS thread and bridges it to an async consumer, because libpcap's blocking read cannot be safely driven from inside the async runtime. It also drops privileges to the two capabilities capture needs.
 - **`report.rs`** is the forensic `--report` builder. Instead of streaming one line per event, it accumulates an in-process picture of every endpoint, fingerprint, and miss, then prints one ranked summary, folding in intelligence and detection automatically whenever a database is present.
-- **`serve.rs`** is the axum dashboard. It serves the built frontend assets and streams events and alerts to the browser over Server-Sent Events. The live feed has three sources: a replayed capture file (paced, optionally looping), a live interface, or, by default, a tail of the database so a separate `tlsfp live --detect` sensor surfaces in the browser.
+- **`serve.rs`** is the axum dashboard. It serves the built frontend assets and streams events and alerts to the browser over Server-Sent Events. The live feed has three sources: a replayed capture file (paced, optionally looping), a live interface, or, by default, a tail of the database so a separate `corvus live --detect` sensor surfaces in the browser.
 
 ```
-   tlsfp live --detect ──writes──> intel.db <──tails── tlsfp serve ──SSE──> browser
+   corvus live --detect ──writes──> intel.db <──tails── corvus serve ──SSE──> browser
                                    (WAL mode lets the reader and writer share the file)
 ```
 

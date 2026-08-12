@@ -73,13 +73,13 @@ cd PROJECTS/intermediate/ja3-ja4-tls-fingerprinting
 
 # Build the binary and seed the threat feeds
 cargo build --release
-./target/release/tlsfp intel seed
+./target/release/corvus intel seed
 
 # Fingerprint a vendored capture, one line per handshake
-./target/release/tlsfp pcap testdata/pcap/tls-handshake.pcapng
+./target/release/corvus pcap testdata/pcap/tls-handshake.pcapng
 
 # Read the whole capture and print one ranked forensic summary
-./target/release/tlsfp pcap testdata/pcap/tls-handshake.pcapng --report
+./target/release/corvus pcap testdata/pcap/tls-handshake.pcapng --report
 ```
 
 Expected output: the plain `pcap` command prints one line per handshake, each with a JA4 and a JA3 and, for a ClientHello, the SNI and ALPN. You will see both `t`-transport fingerprints (TLS over TCP) and `q`-transport fingerprints (TLS inside QUIC) in the same capture, because the vendored file contains both. The `--report` command instead prints a single summary: the busiest endpoints, the most common fingerprints, any intelligence hits, and any alerts.
@@ -87,8 +87,8 @@ Expected output: the plain `pcap` command prints one line per handshake, each wi
 To watch a live interface, grant the binary the two capabilities it needs and point it at an interface:
 
 ```bash
-sudo setcap cap_net_raw,cap_net_admin=eip "$(command -v ./target/release/tlsfp)"
-./target/release/tlsfp live eth0 --intel --detect
+sudo setcap cap_net_raw,cap_net_admin=eip "$(command -v ./target/release/corvus)"
+./target/release/corvus live eth0 --intel --detect
 ```
 
 Stop it with ctrl-c: the first one drains the capture and prints trustworthy final counters, a second exits immediately.
@@ -98,15 +98,15 @@ Stop it with ctrl-c: the first one drains the capture and prints trustworthy fin
 ```
 ja3-ja4-tls-fingerprinting/
 ├── crates/
-│   ├── tlsfp-core/    # the engine: parses TLS, reassembles TCP, computes the fingerprints
-│   ├── tlsfp-intel/   # the store: a bundled SQLite database, matching, and the detection rules
-│   └── tlsfp/         # the binary: the CLI and the web dashboard
+│   ├── corvus-core/    # the engine: parses TLS, reassembles TCP, computes the fingerprints
+│   ├── corvus-intel/   # the store: a bundled SQLite database, matching, and the detection rules
+│   └── corvus/         # the binary: the CLI and the web dashboard
 ├── testdata/pcap/     # vendored captures used as integration fixtures
 ├── frontend/          # the dashboard (Vite + React 19)
 └── install.sh         # the one-shot installer
 ```
 
-The single most important file to understand first is `crates/tlsfp-core/src/ja4.rs`. Everything in the engine exists to feed it a parsed ClientHello; everything in the rest of the tool exists to act on what it returns.
+The single most important file to understand first is `crates/corvus-core/src/ja4.rs`. Everything in the engine exists to feed it a parsed ClientHello; everything in the rest of the tool exists to act on what it returns.
 
 ## Next Steps
 
@@ -119,17 +119,17 @@ The single most important file to understand first is `crates/tlsfp-core/src/ja4
 
 ## Common Issues
 
-**`tlsfp live` fails with a permission error**
+**`corvus live` fails with a permission error**
 ```
 Error: opening interface eth0: you don't have permission to capture
 ```
-Solution: live capture opens a raw socket, which an unprivileged user cannot do. Grant the binary the capabilities once with `sudo setcap cap_net_raw,cap_net_admin=eip "$(command -v tlsfp)"`. File capabilities live on the binary, so repeat the grant after every rebuild.
+Solution: live capture opens a raw socket, which an unprivileged user cannot do. Grant the binary the capabilities once with `sudo setcap cap_net_raw,cap_net_admin=eip "$(command -v corvus)"`. File capabilities live on the binary, so repeat the grant after every rebuild.
 
 **`intel lookup` says no database exists**
 ```
-no intelligence database at ...; run 'tlsfp intel seed' first
+no intelligence database at ...; run 'corvus intel seed' first
 ```
-Solution: the lookup, stats, and alerts commands read an existing database but never create one. Run `tlsfp intel seed` to build it from the three bundled feeds, which needs no network.
+Solution: the lookup, stats, and alerts commands read an existing database but never create one. Run `corvus intel seed` to build it from the three bundled feeds, which needs no network.
 
 **A capture shows fewer handshakes than I expected**
 Solution: a handshake split across many out-of-order segments, or one whose ClientHello arrives after the per-stream byte cap, may not fingerprint. Run with `-v` to see the counters, including `tls_miss_rate` and `segments_dropped`. On a live interface, kernel drops under load do the same; the tool warns when the kernel reports any.

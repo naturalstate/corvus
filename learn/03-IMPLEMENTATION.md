@@ -7,7 +7,7 @@ This document walks the code. It follows one packet from the moment it is read o
 
 ## A frame's journey, end to end
 
-Run `tlsfp pcap traffic.pcapng --detect`. Here is what happens to one frame carrying a ClientHello.
+Run `corvus pcap traffic.pcapng --detect`. Here is what happens to one frame carrying a ClientHello.
 
 ### 1. The source yields a frame
 
@@ -37,7 +37,7 @@ The parsed `ClientHello` goes to `ja3` (in `ja3.rs`) and `ja4` (in `ja4.rs`). Ea
 
 ### 7. The store judges and detects
 
-Back in the binary, the `FingerprintEvent` goes to `tlsfp-intel`. `IntelStore::match_event` runs the matcher (`matcher.rs`) over every fingerprint the event carries and returns a `MatchReport` for each that hit. `IntelStore::detect` opens a transaction and calls `detect::run` (in `detect.rs`), which:
+Back in the binary, the `FingerprintEvent` goes to `corvus-intel`. `IntelStore::match_event` runs the matcher (`matcher.rs`) over every fingerprint the event carries and returns a `MatchReport` for each that hit. `IntelStore::detect` opens a transaction and calls `detect::run` (in `detect.rs`), which:
 
 1. records the event as a row in `observation`,
 2. runs the six rules, correlating the new fingerprint against what this IP and this fingerprint have done inside the time window,
@@ -100,7 +100,7 @@ A productive order, given the journey above:
 4. `pipeline/mod.rs`. The loop that ties the stages together, where `PipelineConfig` sets the bounds.
 5. `quic.rs`. Save it for last; it is self-contained and the comments carry it.
 
-Then cross to `tlsfp-intel`: `matcher.rs` for scoring, `detect.rs` for the rules. Finally `tlsfp/src/cli.rs` to see it all wired.
+Then cross to `corvus-intel`: `matcher.rs` for scoring, `detect.rs` for the rules. Finally `corvus/src/cli.rs` to see it all wired.
 
 ## Where to go next
 

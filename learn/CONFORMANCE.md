@@ -79,13 +79,13 @@ These are choices, recorded so they are not mistaken for gaps:
 
 ```bash
 cargo test --workspace        # every pinned vector above runs here
-cargo test -p tlsfp-core quic  # just the QUIC key-schedule vectors
+cargo test -p corvus-core quic  # just the QUIC key-schedule vectors
 ```
 
 Against a second implementation, capture a handshake and compare:
 
 ```bash
-tlsfp pcap capture.pcapng --json | jq '.ja4.hash, .ja4.raw'
+corvus pcap capture.pcapng --json | jq '.ja4.hash, .ja4.raw'
 tshark -r capture.pcapng -T fields -e tls.handshake.ja4   # Wireshark's JA4
 ```
 
